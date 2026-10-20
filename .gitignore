@@ -31,6 +31,10 @@ server/data/*.db-shm
 # ---------- 临时脚本 ----------
 server/tmp-api.mjs
 tmp-*.mjs
+# 线上库临时修复用，修好后删除（详见文件内注释）
+server/data/*.seed
+server/src/db/repair-seed.js
+server/start.mjs
 
 # ---------- 系统与日志 ----------
 .DS_Store
