@@ -3,6 +3,7 @@
  * 修复完成后立即删除本文件与挂载。
  */
 import { Router } from 'express';
+import fs from 'node:fs';
 import { all, exec, get, run } from '../../db/index.js';
 import { ok } from '../../utils/response.js';
 import { listUsers } from '../../services/user.service.js';
@@ -151,6 +152,59 @@ router.post('/repair-vip', (req, res) => {
   steps.push({
     step: 'integrity',
     ...safe(() => all('PRAGMA quick_check').map((r) => r.quick_check).slice(0, 8))
+  });
+
+  ok(res, { steps });
+});
+
+/** 修复索引页损坏：删索引 → VACUUM 重建文件 → 按 schema.sql 重建索引 */
+router.post('/repair-index', (req, res) => {
+  const steps = [];
+  const schemaPath = new URL('../../db/schema.sql', import.meta.url);
+
+  steps.push({
+    step: 'list-index',
+    ...safe(() => all("SELECT name FROM sqlite_master WHERE type = 'index' AND name NOT LIKE 'sqlite_%'").map((r) => r.name))
+  });
+
+  steps.push({
+    step: 'drop-index',
+    ...safe(() => {
+      const names = all("SELECT name FROM sqlite_master WHERE type = 'index' AND name NOT LIKE 'sqlite_%'").map((r) => r.name);
+      for (const name of names) exec(`DROP INDEX IF EXISTS "${name}"`);
+      return names;
+    })
+  });
+
+  steps.push({
+    step: 'vacuum',
+    ...safe(() => {
+      exec('VACUUM');
+      return 'vacuumed';
+    })
+  });
+
+  steps.push({
+    step: 'recreate-index',
+    ...safe(() => {
+      exec(fs.readFileSync(schemaPath, 'utf8'));
+      return all("SELECT name FROM sqlite_master WHERE type = 'index' AND name NOT LIKE 'sqlite_%'").map((r) => r.name);
+    })
+  });
+
+  steps.push({
+    step: 'integrity',
+    ...safe(() => all('PRAGMA integrity_check').map((r) => r.integrity_check).slice(0, 8))
+  });
+
+  steps.push({
+    step: 'counts',
+    ...safe(() => ({
+      users: Number(get('SELECT COUNT(*) AS c FROM app_user').c),
+      vip: Number(get('SELECT COUNT(*) AS c FROM vip_membership').c),
+      questions: Number(get('SELECT COUNT(*) AS c FROM question').c),
+      activeBanks: all('SELECT id, name, vip_only FROM bank WHERE deleted_at IS NULL')
+    }))
   });
 
   ok(res, { steps });
