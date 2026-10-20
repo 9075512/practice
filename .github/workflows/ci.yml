@@ -1,0 +1,271 @@
+name: CI/CD
+
+# main = 正式分支（只接收来自 dev 的 PR）
+# dev  = 开发分支（只接收 PR，合入后自动测试并部署到测试环境）
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------- 门禁：main 只接受来自 dev 的 PR ----------
+  source-guard:
+    name: source-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: 校验来源分支
+        run: |
+          echo "base=${{ github.base_ref }}  head=${{ github.head_ref }}"
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "非 PR 触发，跳过来源校验"
+            exit 0
+          fi
+          if [ "${{ github.base_ref }}" != "main" ]; then
+            echo "目标分支为 ${{ github.base_ref }}，无需限制来源"
+            exit 0
+          fi
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "::error::main 只接受来自 dev 的 PR，当前来源为 '${{ github.head_ref }}'。请先把改动合入 dev。"
+            exit 1
+          fi
+          echo "来源分支 dev → main，校验通过"
+
+  # ---------- 测试：后端冒烟 + 后台构建 ----------
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 准备 Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            admin/package-lock.json
+
+      - name: 安装后端依赖
+        working-directory: server
+        run: npm ci
+
+      - name: 后端冒烟测试
+        working-directory: server
+        run: npm run smoke
+
+      - name: 安装后台依赖
+        working-directory: admin
+        run: npm ci
+
+      - name: 后台构建
+        working-directory: admin
+        run: npm run build
+
+  # ---------- 部署到测试环境（push 到 dev 时） ----------
+  deploy-dev:
+    name: deploy-dev
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: false
+    environment:
+      name: development
+      url: ${{ vars.DEPLOY_URL }}
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST || vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER || vars.DEPLOY_USER }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || vars.DEPLOY_PORT || '22' }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || vars.DEPLOY_PATH || '/opt/practice' }}
+      DEPLOY_PM2_NAME: ${{ secrets.DEPLOY_PM2_NAME || vars.DEPLOY_PM2_NAME || 'practice' }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      HEALTHCHECK_URL: ${{ vars.DEPLOY_HEALTHCHECK_URL }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 检查部署配置
+        id: preflight
+        run: |
+          missing=""
+          [ -z "$DEPLOY_HOST" ] && missing="$missing DEPLOY_HOST"
+          [ -z "$DEPLOY_USER" ] && missing="$missing DEPLOY_USER"
+          [ -z "$DEPLOY_SSH_KEY" ] && missing="$missing DEPLOY_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::未配置部署凭据（$missing ），本次跳过部署。配置后自动生效，不影响测试结果。"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "部署目标：$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PORT  →  $DEPLOY_PATH"
+          fi
+
+      - name: 安装后台依赖
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: admin
+        run: npm ci
+
+      - name: 构建后台
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: admin
+        run: npm run build
+
+      - name: 同步移动端副本
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: server
+        run: npm run sync:mobile
+
+      - name: 配置 SSH
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 上传代码
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          # 用 tar over ssh，远端无需安装 rsync；排除 data/（远端真实数据库）与 node_modules
+          tar -czf - \
+            --exclude='./data' \
+            --exclude='./node_modules' \
+            --exclude='./.env' \
+            --exclude='./.env.*' \
+            -C server . \
+          | ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+              "mkdir -p '$DEPLOY_PATH' && tar -xzf - -C '$DEPLOY_PATH'"
+
+      - name: 安装依赖并重启服务
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' PM2_NAME='$DEPLOY_PM2_NAME' bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$DEPLOY_PATH"
+          npm ci --omit=dev
+          if command -v pm2 >/dev/null 2>&1; then
+            pm2 restart "$PM2_NAME" --update-env 2>/dev/null || pm2 start src/server.js --name "$PM2_NAME"
+            pm2 save
+          else
+            echo "远端未安装 pm2，请手动重启服务" >&2
+            exit 1
+          fi
+          REMOTE
+
+      - name: 健康检查
+        if: steps.preflight.outputs.ready == 'true' && vars.DEPLOY_HEALTHCHECK_URL != ''
+        run: |
+          curl -fsS --retry 10 --retry-delay 3 --retry-connrefused "$HEALTHCHECK_URL" >/dev/null
+          echo "健康检查通过：$HEALTHCHECK_URL"
+
+  # ---------- 部署到生产环境（push 到 main 时） ----------
+  deploy-prod:
+    name: deploy-prod
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: ${{ vars.PROD_DEPLOY_URL }}
+    env:
+      DEPLOY_HOST: ${{ secrets.PROD_DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.PROD_DEPLOY_USER }}
+      DEPLOY_PORT: ${{ secrets.PROD_DEPLOY_PORT || '22' }}
+      DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '/opt/practice' }}
+      DEPLOY_PM2_NAME: ${{ secrets.PROD_DEPLOY_PM2_NAME || 'practice' }}
+      DEPLOY_SSH_KEY: ${{ secrets.PROD_DEPLOY_SSH_KEY }}
+      HEALTHCHECK_URL: ${{ vars.PROD_DEPLOY_HEALTHCHECK_URL }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 检查部署配置
+        id: preflight
+        run: |
+          missing=""
+          [ -z "$DEPLOY_HOST" ] && missing="$missing PROD_DEPLOY_HOST"
+          [ -z "$DEPLOY_USER" ] && missing="$missing PROD_DEPLOY_USER"
+          [ -z "$DEPLOY_SSH_KEY" ] && missing="$missing PROD_DEPLOY_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::未配置生产部署凭据（$missing ），本次跳过生产部署。"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "生产目标：$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PORT  →  $DEPLOY_PATH"
+          fi
+
+      - name: 安装后台依赖
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: admin
+        run: npm ci
+
+      - name: 构建后台
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: admin
+        run: npm run build
+
+      - name: 同步移动端副本
+        if: steps.preflight.outputs.ready == 'true'
+        working-directory: server
+        run: npm run sync:mobile
+
+      - name: 配置 SSH
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 上传代码
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          tar -czf - \
+            --exclude='./data' \
+            --exclude='./node_modules' \
+            --exclude='./.env' \
+            --exclude='./.env.*' \
+            -C server . \
+          | ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+              "mkdir -p '$DEPLOY_PATH' && tar -xzf - -C '$DEPLOY_PATH'"
+
+      - name: 安装依赖并重启服务
+        if: steps.preflight.outputs.ready == 'true'
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' PM2_NAME='$DEPLOY_PM2_NAME' bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$DEPLOY_PATH"
+          npm ci --omit=dev
+          if command -v pm2 >/dev/null 2>&1; then
+            pm2 restart "$PM2_NAME" --update-env 2>/dev/null || pm2 start src/server.js --name "$PM2_NAME"
+            pm2 save
+          else
+            echo "远端未安装 pm2，请手动重启服务" >&2
+            exit 1
+          fi
+          REMOTE
+
+      - name: 健康检查
+        if: steps.preflight.outputs.ready == 'true' && vars.PROD_DEPLOY_HEALTHCHECK_URL != ''
+        run: |
+          curl -fsS --retry 10 --retry-delay 3 --retry-connrefused "$HEALTHCHECK_URL" >/dev/null
+          echo "健康检查通过：$HEALTHCHECK_URL"
