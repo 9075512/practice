@@ -1,0 +1,12 @@
+{
+  "name": "背题库",
+  "short_name": "背题库",
+  "description": "按题库与题型筛选，翻卡背诵",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F6FB",
+  "theme_color": "#2563EB",
+  "lang": "zh-CN"
+}

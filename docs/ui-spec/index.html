@@ -1,0 +1,2766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>练题云 UI 设计规范 v1.0</title>
+    <!-- 真实令牌与组件层：本页的组件示例直接复用这两个文件 -->
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="components.css" />
+    <style>
+      :root {
+        --brand-50: #f5f9ff;
+        --brand-100: #eff6ff;
+        --brand-200: #c7d9fd;
+        --brand-300: #93b4fa;
+        --brand-400: #5b8bf5;
+        --brand-500: #3b82f6;
+        --brand-600: #2563eb;
+        --brand-700: #1d4ed8;
+        --brand-800: #1e40af;
+        --bg: #f4f6fb;
+        --bg-subtle: #f8fafc;
+        --surface: #ffffff;
+        --text: #0f172a;
+        --text-secondary: #475569;
+        --muted: #64748b;
+        --subtle: #94a3b8;
+        --border: #e5e9f2;
+        --border-soft: #eef2f7;
+        --success: #10b981;
+        --success-soft: #ecfdf5;
+        --success-text: #047857;
+        --warning: #f59e0b;
+        --warning-soft: #fffbeb;
+        --warning-text: #b45309;
+        --danger: #ef4444;
+        --danger-soft: #fef2f2;
+        --danger-text: #b91c1c;
+        --info: #0891b2;
+        --info-soft: #ecfeff;
+        --purple: #7c3aed;
+        --purple-soft: #f5f3ff;
+        --orange: #ea580c;
+        --orange-soft: #fff7ed;
+        --radius-xs: 6px;
+        --radius-sm: 8px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --radius-pill: 999px;
+        --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+        --shadow-brand: 0 6px 14px rgba(37, 99, 235, 0.26);
+        --shadow-drawer: 12px 0 32px rgba(15, 23, 42, 0.12);
+        --font-sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--brand-600);
+        text-decoration: none;
+      }
+
+      /* ---------- shell ---------- */
+      .side {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 248px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 22px 16px;
+        overflow-y: auto;
+        z-index: 20;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 0 8px 22px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #fff;
+        font-size: 19px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-brand);
+      }
+
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+
+      .brand-sub {
+        font-size: 9px;
+        letter-spacing: 1.4px;
+        color: var(--subtle);
+        margin-top: 2px;
+      }
+
+      .nav-group-label {
+        font-size: 10px;
+        letter-spacing: 1px;
+        color: var(--subtle);
+        padding: 14px 12px 6px;
+      }
+
+      .nav a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-radius: 9px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        margin-bottom: 2px;
+        transition: background 0.18s var(--ease), color 0.18s var(--ease);
+      }
+
+      .nav a:hover {
+        background: #f1f5f9;
+        color: var(--text);
+      }
+
+      .nav a.active {
+        background: var(--brand-100);
+        color: var(--brand-700);
+        font-weight: 600;
+      }
+
+      .nav a span.num {
+        font-size: 10px;
+        color: var(--subtle);
+        font-family: var(--font-mono);
+        margin-left: 8px;
+      }
+
+      .nav a.active span.num {
+        color: var(--brand-400);
+      }
+
+      .side-foot {
+        margin-top: 22px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-soft);
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .side-foot b {
+        color: var(--text-secondary);
+      }
+
+      .main {
+        margin-left: 248px;
+        padding: 40px 48px 80px;
+        max-width: 1280px;
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        background: linear-gradient(140deg, #1e40af 0%, #2563eb 52%, #3b82f6 100%);
+        color: #fff;
+        padding: 42px 44px;
+        margin-bottom: 44px;
+        box-shadow: 0 16px 40px rgba(37, 99, 235, 0.22);
+      }
+
+      .hero::before,
+      .hero::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .hero::before {
+        width: 380px;
+        height: 380px;
+        right: -120px;
+        top: -180px;
+      }
+
+      .hero::after {
+        width: 220px;
+        height: 220px;
+        right: 120px;
+        bottom: -150px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        font-size: 11px;
+        letter-spacing: 0.6px;
+      }
+
+      .hero h1 {
+        margin: 18px 0 10px;
+        font-size: 38px;
+        line-height: 1.25;
+        letter-spacing: -0.8px;
+        font-weight: 700;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 640px;
+        font-size: 14px;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .hero-meta {
+        display: flex;
+        gap: 28px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+      }
+
+      .hero-meta div {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .hero-meta b {
+        display: block;
+        font-size: 18px;
+        color: #fff;
+        font-weight: 650;
+        margin-bottom: 3px;
+        letter-spacing: -0.2px;
+      }
+
+      /* ---------- section ---------- */
+      .section {
+        margin-bottom: 56px;
+        scroll-margin-top: 24px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .section-index {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--brand-300);
+        padding-top: 6px;
+        width: 26px;
+        flex: none;
+      }
+
+      .section h2 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.3px;
+        font-weight: 650;
+      }
+
+      .section-desc {
+        margin: 5px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+        max-width: 760px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+      }
+
+      .panel-pad {
+        padding: 22px 24px;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 24px 0;
+      }
+
+      .panel-title {
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .panel-sub {
+        margin-top: 3px;
+        font-size: 12px;
+        color: var(--subtle);
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .g2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .g3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .g4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .mb-14 {
+        margin-bottom: 14px;
+      }
+
+      /* ---------- color ---------- */
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .swatch {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+
+      .swatch-color {
+        height: 74px;
+        display: flex;
+        align-items: flex-end;
+        padding: 8px 10px;
+        font-size: 10px;
+        font-family: var(--font-mono);
+        color: rgba(255, 255, 255, 0.82);
+      }
+
+      .swatch-color.dark-text {
+        color: rgba(15, 23, 42, 0.62);
+      }
+
+      .swatch-meta {
+        padding: 9px 11px 10px;
+      }
+
+      .swatch-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .swatch-use {
+        margin-top: 2px;
+        font-size: 10.5px;
+        color: var(--subtle);
+        line-height: 1.5;
+      }
+
+      .token-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--divider, #f1f5f9);
+      }
+
+      .token-row:last-child {
+        border-bottom: none;
+      }
+
+      .token-name {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+      }
+
+      .token-value {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-soft);
+        border-radius: 6px;
+        padding: 2px 8px;
+      }
+
+      /* ---------- type ---------- */
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        padding: 13px 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .type-row:last-child {
+        border-bottom: none;
+      }
+
+      .type-sample {
+        flex: 1;
+        min-width: 0;
+        color: var(--text);
+      }
+
+      .type-label {
+        width: 150px;
+        flex: none;
+        font-size: 11.5px;
+        color: var(--subtle);
+      }
+
+      .mono {
+        font-family: var(--font-mono);
+      }
+
+      /* ---------- spacing / radius ---------- */
+      .space-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 5px 0;
+      }
+
+      .space-label {
+        width: 56px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        flex: none;
+      }
+
+      .space-bar {
+        height: 12px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #93b4fa, #2563eb);
+      }
+
+      .radius-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .radius-box {
+        height: 86px;
+        background: var(--brand-100);
+        border: 1px solid var(--brand-200);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--brand-700);
+      }
+
+      .shadow-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .shadow-box {
+        height: 96px;
+        border-radius: var(--radius-lg);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* ---------- layout wireframe ---------- */
+      .wireframe {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      .wf-top {
+        display: flex;
+        height: 300px;
+      }
+
+      .wf-side {
+        width: 132px;
+        flex: none;
+        background: #fff;
+        border-right: 1px solid var(--border);
+        padding: 12px 10px;
+      }
+
+      .wf-logo {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: var(--brand-600);
+        margin-bottom: 14px;
+      }
+
+      .wf-nav {
+        height: 16px;
+        border-radius: 5px;
+        background: #eef2f7;
+        margin-bottom: 7px;
+      }
+
+      .wf-nav.on {
+        background: var(--brand-100);
+      }
+
+      .wf-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .wf-bar {
+        height: 38px;
+        background: rgba(255, 255, 255, 0.75);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 8px;
+      }
+
+      .wf-bar div {
+        height: 10px;
+        border-radius: 4px;
+        background: #e2e8f0;
+      }
+
+      .wf-content {
+        padding: 12px;
+      }
+
+      .wf-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .wf-kpi {
+        height: 56px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .wf-charts {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 8px;
+      }
+
+      .wf-chart {
+        height: 136px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .wf-annot {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        padding: 12px 14px;
+        border-top: 1px solid var(--border);
+        background: #fff;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .wf-annot b {
+        color: var(--text-secondary);
+      }
+
+      /* ---------- components ---------- */
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .demo {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+        padding: 18px;
+      }
+
+      .demo-label {
+        font-size: 11px;
+        color: var(--subtle);
+        letter-spacing: 0.4px;
+        margin-bottom: 14px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 36px;
+        padding: 0 16px;
+        border-radius: var(--radius-sm);
+        border: 1px solid transparent;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.18s var(--ease);
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: var(--brand-600);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--brand-400);
+      }
+
+      .btn-default {
+        background: #fff;
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+
+      .btn-default:hover {
+        border-color: var(--brand-300);
+        color: var(--brand-600);
+      }
+
+      .btn-danger {
+        background: var(--danger-soft);
+        border-color: #fecaca;
+        color: var(--danger-text);
+      }
+
+      .btn-text {
+        background: transparent;
+        color: var(--brand-600);
+        padding: 0 6px;
+      }
+
+      .btn-sm {
+        height: 30px;
+        font-size: 12px;
+        padding: 0 12px;
+      }
+
+      .btn-lg {
+        height: 44px;
+        font-size: 14px;
+        padding: 0 22px;
+      }
+
+      .btn[disabled] {
+        background: #bfdbfe;
+        color: #fff;
+        cursor: not-allowed;
+      }
+
+      .field-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+        display: flex;
+        gap: 4px;
+      }
+
+      .field-label em {
+        color: var(--danger);
+        font-style: normal;
+      }
+
+      .input,
+      .select {
+        width: 100%;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: #fff;
+        padding: 0 12px;
+        font-size: 13px;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .input::placeholder {
+        color: #cbd5e1;
+      }
+
+      .input.focus {
+        border-color: var(--brand-600);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+
+      .input .ph {
+        color: #cbd5e1;
+      }
+
+      .chev {
+        width: 6px;
+        height: 6px;
+        border-right: 1.5px solid #94a3b8;
+        border-bottom: 1.5px solid #94a3b8;
+        transform: rotate(45deg);
+        margin-left: 8px;
+      }
+
+      .switch {
+        width: 36px;
+        height: 20px;
+        border-radius: 999px;
+        background: var(--brand-600);
+        position: relative;
+        display: inline-block;
+      }
+
+      .switch::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        top: 2px;
+        right: 2px;
+      }
+
+      .switch.off {
+        background: #dcdfe6;
+      }
+
+      .switch.off::after {
+        right: auto;
+        left: 2px;
+      }
+
+      .radio,
+      .check {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-right: 18px;
+      }
+
+      .radio i {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1.5px solid #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .radio.on i {
+        border-color: var(--brand-600);
+      }
+
+      .radio.on i::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--brand-600);
+      }
+
+      .check i {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .check.on i {
+        background: var(--brand-600);
+        border-color: var(--brand-600);
+      }
+
+      .check.on i::after {
+        content: '';
+        width: 8px;
+        height: 4px;
+        border-left: 2px solid #fff;
+        border-bottom: 2px solid #fff;
+        transform: rotate(-45deg) translateY(-1px);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 1px 8px;
+        border-radius: 6px;
+        border: 1px solid;
+        font-size: 12px;
+        line-height: 20px;
+        white-space: nowrap;
+      }
+
+      .tag-single {
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.08);
+        border-color: rgba(37, 99, 235, 0.2);
+      }
+
+      .tag-multiple {
+        color: #7c3aed;
+        background: rgba(124, 58, 237, 0.08);
+        border-color: rgba(124, 58, 237, 0.2);
+      }
+
+      .tag-judge {
+        color: #0891b2;
+        background: rgba(8, 145, 178, 0.08);
+        border-color: rgba(8, 145, 178, 0.2);
+      }
+
+      .tag-fill {
+        color: #ea580c;
+        background: rgba(234, 88, 12, 0.08);
+        border-color: rgba(234, 88, 12, 0.2);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        line-height: 20px;
+      }
+
+      .chip i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .chip-success {
+        color: #047857;
+        background: #d1fae5;
+      }
+
+      .chip-warning {
+        color: #b45309;
+        background: #fef3c7;
+      }
+
+      .chip-danger {
+        color: #b91c1c;
+        background: #fee2e2;
+      }
+
+      .chip-info {
+        color: #0e7490;
+        background: #cffafe;
+      }
+
+      .chip-neutral {
+        color: #475569;
+        background: #f1f5f9;
+      }
+
+      /* ---------- KPI ---------- */
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .kpi {
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px 17px 14px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 8px 22px rgba(15, 23, 42, 0.035);
+      }
+
+      .kpi::after {
+        content: '';
+        position: absolute;
+        right: -20px;
+        bottom: -40px;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: var(--brand-600);
+        opacity: 0.045;
+      }
+
+      .kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .kpi-label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .kpi-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--brand-600);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .kpi-icon.green {
+        background: var(--success);
+      }
+
+      .kpi-icon.orange {
+        background: var(--warning);
+      }
+
+      .kpi-icon.red {
+        background: var(--danger);
+      }
+
+      .kpi-value {
+        margin-top: 7px;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.6px;
+        line-height: 1.1;
+      }
+
+      .kpi-value span {
+        font-size: 11.5px;
+        color: var(--subtle);
+        font-weight: 500;
+        margin-left: 4px;
+        letter-spacing: 0;
+      }
+
+      .kpi-hint {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--subtle);
+      }
+
+      /* ---------- table ---------- */
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+
+      /* 列多的表格在窄屏横向滚动，不压缩字词 */
+      .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table-wrap .table--wide {
+        min-width: 720px;
+      }
+
+      .table th {
+        text-align: left;
+        padding: 11px 12px;
+        background: var(--bg-subtle);
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 11.5px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .table td {
+        padding: 11px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        color: var(--text-secondary);
+      }
+
+      .table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table tr:hover td {
+        background: #f8fbff;
+      }
+
+      .table .strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .link {
+        color: var(--brand-600);
+        font-size: 12.5px;
+        cursor: pointer;
+      }
+
+      .link.danger {
+        color: var(--danger);
+      }
+
+      /* ---------- pagination ---------- */
+      .pager {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .pg {
+        min-width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        background: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .pg.on {
+        background: var(--brand-600);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      /* ---------- empty ---------- */
+      .empty {
+        text-align: center;
+        padding: 30px 0;
+      }
+
+      .empty-ring {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        border: 7px solid #e2e8f0;
+        border-top-color: #bfdbfe;
+        transform: rotate(35deg);
+        margin: 0 auto 14px;
+      }
+
+      .empty-text {
+        font-size: 12.5px;
+        color: var(--subtle);
+      }
+
+      /* ---------- drawer / modal ---------- */
+      .drawer-demo {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: var(--shadow-drawer);
+      }
+
+      .drawer-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .drawer-body {
+        padding: 16px;
+        background: #fff;
+      }
+
+      .drawer-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        background: #fff;
+      }
+
+      .close-x {
+        color: var(--subtle);
+        font-size: 16px;
+      }
+
+      /* ---------- chart ---------- */
+      .chart-box {
+        padding: 16px 18px 8px;
+      }
+
+      .chart-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .chart-title {
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .chart-sub {
+        margin-top: 3px;
+        font-size: 11px;
+        color: var(--subtle);
+      }
+
+      .legend {
+        display: flex;
+        gap: 10px;
+        font-size: 10px;
+        color: var(--muted);
+        align-items: center;
+      }
+
+      .legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 4px;
+      }
+
+      /* ---------- code ---------- */
+      pre {
+        margin: 0;
+        padding: 18px 20px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 12px;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        line-height: 1.75;
+      }
+
+      code {
+        font-family: var(--font-mono);
+      }
+
+      .code-wrap {
+        position: relative;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
+        color: #cbd5e1;
+        font-size: 10.5px;
+        cursor: pointer;
+      }
+
+      .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .rule-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .rule {
+        border-radius: 12px;
+        padding: 15px 16px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        border: 1px solid;
+      }
+
+      .rule.do {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+        color: #065f46;
+      }
+
+      .rule.dont {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #991b1b;
+      }
+
+      .rule b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+      }
+
+      /* ---------- mobile ---------- */
+      .phone {
+        width: 320px;
+        border: 8px solid #0f172a;
+        border-radius: 36px;
+        background: var(--bg);
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+      }
+
+      .phone-notch {
+        height: 22px;
+        background: #0f172a;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 5px;
+      }
+
+      .phone-notch i {
+        width: 62px;
+        height: 5px;
+        border-radius: 999px;
+        background: #334155;
+        display: block;
+      }
+
+      .phone-bar {
+        background: #fff;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .phone-menu {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: var(--text-secondary);
+      }
+
+      .phone-title {
+        font-size: 13px;
+        font-weight: 650;
+      }
+
+      .phone-avatar {
+        margin-left: auto;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--brand-600);
+        color: #fff;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .phone-body {
+        padding: 10px;
+      }
+
+      .phone-kpis {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .phone-kpi {
+        background: #fff;
+        border-radius: 10px;
+        padding: 9px 10px;
+      }
+
+      .phone-kpi span {
+        display: block;
+        font-size: 8px;
+        color: var(--subtle);
+      }
+
+      .phone-kpi b {
+        font-size: 16px;
+        letter-spacing: -0.3px;
+      }
+
+      .phone-row {
+        background: #fff;
+        border-radius: 10px;
+        padding: 9px 10px;
+        margin-bottom: 7px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .phone-row div {
+        min-width: 0;
+      }
+
+      .phone-row b {
+        display: block;
+        font-size: 10px;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .phone-row span {
+        font-size: 8px;
+        color: var(--subtle);
+      }
+
+      .phone-row em {
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--success);
+        flex: none;
+      }
+
+      .phone-caption {
+        text-align: center;
+        font-size: 11px;
+        color: var(--subtle);
+        margin-top: 12px;
+      }
+
+      /* ---------- misc ---------- */
+      .note {
+        display: flex;
+        gap: 8px;
+        padding: 11px 13px;
+        border-radius: 9px;
+        background: var(--brand-100);
+        border: 1px solid var(--brand-200);
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 1.7;
+        margin-top: 12px;
+      }
+
+      .note b {
+        color: var(--brand-700);
+      }
+
+      .foot {
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 11px;
+        color: var(--subtle);
+      }
+
+      @media (max-width: 1100px) {
+        .swatch-grid,
+        .kpis {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .g4 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        .side {
+          position: static;
+          width: auto;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding: 14px 16px;
+        }
+
+        .brand {
+          padding-bottom: 12px;
+        }
+
+        .nav {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          padding-bottom: 4px;
+        }
+
+        .nav-group-label,
+        .side-foot {
+          display: none;
+        }
+
+        .nav a {
+          flex: none;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          padding: 6px 12px;
+          font-size: 12px;
+          margin: 0;
+        }
+
+        .nav a span.num {
+          display: none;
+        }
+
+        .main {
+          margin-left: 0;
+          padding: 22px 16px 60px;
+        }
+
+        .hero {
+          padding: 28px 22px;
+          border-radius: 16px;
+        }
+
+        .hero h1 {
+          font-size: 28px;
+        }
+
+        .grid,
+        .demo-grid,
+        .rule-grid,
+        .shadow-grid,
+        .g2,
+        .g3 {
+          grid-template-columns: 1fr;
+        }
+
+        .radius-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .section {
+          margin-bottom: 40px;
+        }
+
+        .type-label {
+          width: 90px;
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="side">
+      <div class="brand">
+        <div class="brand-mark">练</div>
+        <div>
+          <div class="brand-name">练题云 UI</div>
+          <div class="brand-sub">DESIGN SPEC · V1.0</div>
+        </div>
+      </div>
+
+      <div class="nav-group-label">基础</div>
+      <nav class="nav">
+        <a class="active" href="#overview">设计概览 <span class="num">01</span></a>
+        <a href="#color">色彩系统 <span class="num">02</span></a>
+        <a href="#type">字体与排版 <span class="num">03</span></a>
+        <a href="#shape">间距与形状 <span class="num">04</span></a>
+        <a href="#layout">布局与栅格 <span class="num">05</span></a>
+      </nav>
+
+      <div class="nav-group-label">组件</div>
+      <nav class="nav">
+        <a href="#actions">按钮与操作 <span class="num">06</span></a>
+        <a href="#forms">表单控件 <span class="num">07</span></a>
+        <a href="#tags">标签与状态 <span class="num">08</span></a>
+        <a href="#cards">卡片与表格 <span class="num">09</span></a>
+        <a href="#feedback">抽屉与空态 <span class="num">10</span></a>
+        <a href="#charts">数据可视化 <span class="num">11</span></a>
+      </nav>
+
+      <div class="nav-group-label">落地</div>
+      <nav class="nav">
+        <a href="#mobile">移动端 <span class="num">12</span></a>
+        <a href="#a11y">可用性 <span class="num">13</span></a>
+        <a href="#code">工程接入 <span class="num">14</span></a>
+        <a href="#kit">组件资产 <span class="num">15</span></a>
+      </nav>
+
+      <div class="side-foot">
+        <b>适用场景</b><br />
+        中后台 / 数据看板 / 题库与内容管理<br />
+        浅色主题 · 14px 基准 · Element Plus 友好
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <span class="hero-tag">UI DESIGN SPECIFICATION · 2026</span>
+        <h1>练题云界面设计规范</h1>
+        <p>
+          从练题系统后台沉淀的一套浅色中后台视觉体系：以克制的蓝色品牌色、清晰的信息层级和稳定的列表密度为核心，
+          覆盖色彩、排版、布局、组件、图表与移动端适配。本文档中的数值均取自线上系统，可直接复制到其他项目。
+        </p>
+        <div class="hero-meta">
+          <div><b>14px</b>基准字号</div>
+          <div><b>#2563EB</b>品牌主色</div>
+          <div><b>14px</b>卡片圆角</div>
+          <div><b>390px</b>移动端基准</div>
+        </div>
+      </header>
+
+      <section class="section" id="overview">
+        <div class="section-head">
+          <div class="section-index">01</div>
+          <div>
+            <h2>设计概览</h2>
+            <p class="section-desc">四条原则决定这套界面的取舍：信息优先、层级克制、操作可预期、桌面与手机同源。</p>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="panel panel-pad">
+            <div class="panel-title">信息优先</div>
+            <p class="section-desc">
+              列表与看板先回答“现在怎么样”，再提供操作。数据用字重和字号建立层级，不依赖大面积色块；颜色只用于状态、趋势与主操作。
+            </p>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title">层级克制</div>
+            <p class="section-desc">
+              一张页面最多一个主按钮；卡片只用一层阴影；分割线优先于边框；强调色只出现在品牌、链接、选中态和关键数字上。
+            </p>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title">操作可预期</div>
+            <p class="section-desc">
+              主操作固定在右侧或底部；危险操作使用红色文字按钮并二次确认；筛选、分页、空态位置在所有列表页保持一致。
+            </p>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title">双端同源</div>
+            <p class="section-desc">
+              不为手机复制第二套页面：同一套组件通过断点收敛列、宽度与间距。桌面保留完整信息，手机保留关键指标与操作。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="color">
+        <div class="section-head">
+          <div class="section-index">02</div>
+          <div>
+            <h2>色彩系统</h2>
+            <p class="section-desc">主色承担品牌与主操作，中性色承担 90% 的界面，语义色只表达状态。所有色值均已通过对比度检查。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14">
+          <div class="panel-title" style="margin-bottom: 14px">品牌蓝</div>
+          <div class="swatch-grid">
+            <div class="swatch">
+              <div class="swatch-color" style="background: #f5f9ff; color: #64748b">50</div>
+              <div class="swatch-meta"><div class="swatch-name">#F5F9FF</div><div class="swatch-use">页面高亮底</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color dark-text" style="background: #eff6ff">100</div>
+              <div class="swatch-meta"><div class="swatch-name">#EFF6FF</div><div class="swatch-use">选中 / 标签底</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color dark-text" style="background: #c7d9fd">200</div>
+              <div class="swatch-meta"><div class="swatch-name">#C7D9FD</div><div class="swatch-use">浅边框 / 禁用主按钮</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #93b4fa">300</div>
+              <div class="swatch-meta"><div class="swatch-name">#93B4FA</div><div class="swatch-use">聚焦 / hover 辅助</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #5b8bf5">400</div>
+              <div class="swatch-meta"><div class="swatch-name">#5B8BF5</div><div class="swatch-use">主按钮 hover</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #2563eb">600</div>
+              <div class="swatch-meta"><div class="swatch-name">#2563EB</div><div class="swatch-use">品牌主色 / 主按钮</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #1d4ed8">700</div>
+              <div class="swatch-meta"><div class="swatch-name">#1D4ED8</div><div class="swatch-use">按下 / 选中文字</div></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #1e40af">800</div>
+              <div class="swatch-meta"><div class="swatch-name">#1E40AF</div><div class="swatch-use">深色渐变起点</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g2 mb-14">
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 12px">中性色</div>
+            <div class="token-row"><span class="token-name">页面背景</span><span class="token-value">#F4F6FB</span></div>
+            <div class="token-row"><span class="token-name">卡片 / 表面</span><span class="token-value">#FFFFFF</span></div>
+            <div class="token-row"><span class="token-name">主文字</span><span class="token-value">#0F172A</span></div>
+            <div class="token-row"><span class="token-name">次文字</span><span class="token-value">#475569</span></div>
+            <div class="token-row"><span class="token-name">辅助文字</span><span class="token-value">#64748B</span></div>
+            <div class="token-row"><span class="token-name">弱提示</span><span class="token-value">#94A3B8</span></div>
+            <div class="token-row"><span class="token-name">边框</span><span class="token-value">#E5E9F2</span></div>
+            <div class="token-row"><span class="token-name">浅分割</span><span class="token-value">#EEF2F7</span></div>
+            <div class="token-row"><span class="token-name">表头底</span><span class="token-value">#F8FAFC</span></div>
+          </div>
+
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 12px">语义色</div>
+            <div class="token-row">
+              <span class="chip chip-success"><i></i>成功 / 已提交</span>
+              <span class="token-value">#10B981</span>
+            </div>
+            <div class="token-row">
+              <span class="chip chip-warning"><i></i>警告 / 进行中</span>
+              <span class="token-value">#F59E0B</span>
+            </div>
+            <div class="token-row">
+              <span class="chip chip-danger"><i></i>错误 / 已删除</span>
+              <span class="token-value">#EF4444</span>
+            </div>
+            <div class="token-row">
+              <span class="chip chip-info"><i></i>信息 / 判断题</span>
+              <span class="token-value">#0891B2</span>
+            </div>
+            <div class="token-row">
+              <span class="chip chip-neutral"><i></i>停用 / 中性</span>
+              <span class="token-value">#64748B</span>
+            </div>
+            <div class="note" style="margin-top: 14px">
+              <span><b>用法：</b>语义色以“浅底 + 深字 + 同色描边”组合出现；实心色仅用于图标块、进度与图表，不用于大面积背景。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="panel-head" style="padding: 0 0 12px">
+            <div>
+              <div class="panel-title">图表色板</div>
+              <div class="panel-sub">按顺序取色，保证同一页面内不同序列可区分</div>
+            </div>
+          </div>
+          <div class="swatch-grid">
+            <div class="swatch"><div class="swatch-color" style="background: #2563eb">01</div><div class="swatch-meta"><div class="swatch-name">#2563EB</div><div class="swatch-use">主序列 / 柱状</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #0ea5e9">02</div><div class="swatch-meta"><div class="swatch-name">#0EA5E9</div><div class="swatch-use">次序列</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #10b981">03</div><div class="swatch-meta"><div class="swatch-name">#10B981</div><div class="swatch-use">正确率 / 正向</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #f59e0b">04</div><div class="swatch-meta"><div class="swatch-name">#F59E0B</div><div class="swatch-use">提醒 / 中间值</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #ef4444">05</div><div class="swatch-meta"><div class="swatch-name">#EF4444</div><div class="swatch-use">错误 / 负向</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #8b5cf6">06</div><div class="swatch-meta"><div class="swatch-name">#8B5CF6</div><div class="swatch-use">分类对比</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #14b8a6">07</div><div class="swatch-meta"><div class="swatch-name">#14B8A6</div><div class="swatch-use">辅助序列</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background: #f97316">08</div><div class="swatch-meta"><div class="swatch-name">#F97316</div><div class="swatch-use">强调 / 对比</div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="type">
+        <div class="section-head">
+          <div class="section-index">03</div>
+          <div>
+            <h2>字体与排版</h2>
+            <p class="section-desc">中文优先使用苹方 / 微软雅黑，数字与英文使用 Inter。正文 13–14px，标题靠字重与字距建立层级。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 40px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.2">看得见的进步</div>
+            <div class="type-label">Display / 40 / 700<br />登录页主标题</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 22px; font-weight: 650; letter-spacing: -0.3px">页面标题 · 数据看板</div>
+            <div class="type-label">Page Title / 22 / 650</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 20px; font-weight: 650">顶部导航标题</div>
+            <div class="type-label">Navbar / 20 / 650</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 15px; font-weight: 650">卡片标题 · 练习趋势</div>
+            <div class="type-label">Card Title / 15 / 650</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 14px">正文内容：今天也来练几题，保持练习节奏。</div>
+            <div class="type-label">Body / 14 / 400</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 13px; color: #475569">表单标签、表格正文、次级说明。</div>
+            <div class="type-label">Label / 13 / 400</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 12px; color: #94a3b8">辅助信息与时间戳 · 2026-10-18 17:04</div>
+            <div class="type-label">Caption / 12 / 400</div>
+          </div>
+          <div class="type-row">
+            <div class="type-sample" style="font-size: 11px; color: #94a3b8">最小提示文字，仅用于非关键信息</div>
+            <div class="type-label">Micro / 11 / 400</div>
+          </div>
+        </div>
+
+        <div class="note">
+          <span><b>排版规则：</b>正文行高 1.6；数字较大时（≥22px）增加 -0.3 ~ -0.8px 字距；同一卡片内不超过 3 种字号；弱提示 #94A3B8 不用于正文。</span>
+        </div>
+      </section>
+
+      <section class="section" id="shape">
+        <div class="section-head">
+          <div class="section-index">04</div>
+          <div>
+            <h2>间距、圆角与阴影</h2>
+            <p class="section-desc">以 4px 为基础单位；卡片 14px 圆角，控件 8px，标签 6px；阴影只承担“浮起”语义，不叠加多层。</p>
+          </div>
+        </div>
+
+        <div class="grid g2 mb-14">
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 12px">间距刻度</div>
+            <div class="space-row"><span class="space-label">4</span><span class="space-bar" style="width: 4px"></span></div>
+            <div class="space-row"><span class="space-label">6</span><span class="space-bar" style="width: 6px"></span></div>
+            <div class="space-row"><span class="space-label">8</span><span class="space-bar" style="width: 8px"></span></div>
+            <div class="space-row"><span class="space-label">10</span><span class="space-bar" style="width: 10px"></span></div>
+            <div class="space-row"><span class="space-label">12</span><span class="space-bar" style="width: 12px"></span></div>
+            <div class="space-row"><span class="space-label">14</span><span class="space-bar" style="width: 14px"></span></div>
+            <div class="space-row"><span class="space-label">16</span><span class="space-bar" style="width: 16px"></span></div>
+            <div class="space-row"><span class="space-label">20</span><span class="space-bar" style="width: 20px"></span></div>
+            <div class="space-row"><span class="space-label">24</span><span class="space-bar" style="width: 24px"></span></div>
+            <div class="space-row"><span class="space-label">32</span><span class="space-bar" style="width: 32px"></span></div>
+            <div class="space-row"><span class="space-label">40</span><span class="space-bar" style="width: 40px"></span></div>
+          </div>
+
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 12px">使用建议</div>
+            <div class="token-row"><span class="token-name">卡片内边距</span><span class="token-value">18–24px</span></div>
+            <div class="token-row"><span class="token-name">卡片间距</span><span class="token-value">14–18px</span></div>
+            <div class="token-row"><span class="token-name">表单行距</span><span class="token-value">18–22px</span></div>
+            <div class="token-row"><span class="token-name">控件间距</span><span class="token-value">8–10px</span></div>
+            <div class="token-row"><span class="token-name">页面左右边距（桌面）</span><span class="token-value">28px</span></div>
+            <div class="token-row"><span class="token-name">页面左右边距（手机）</span><span class="token-value">12px</span></div>
+            <div class="token-row"><span class="token-name">表格单元格</span><span class="token-value">10–12px</span></div>
+            <div class="token-row"><span class="token-name">按钮内边距</span><span class="token-value">0 16px</span></div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14">
+          <div class="panel-title" style="margin-bottom: 14px">圆角</div>
+          <div class="radius-grid">
+            <div class="radius-box" style="border-radius: 6px">6 · 标签</div>
+            <div class="radius-box" style="border-radius: 8px">8 · 控件</div>
+            <div class="radius-box" style="border-radius: 10px">10 · 小卡</div>
+            <div class="radius-box" style="border-radius: 14px">14 · 面板</div>
+            <div class="radius-box" style="border-radius: 18px">18 · 容器</div>
+            <div class="radius-box" style="border-radius: 999px">999 · 胶囊</div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="panel-title" style="margin-bottom: 14px">阴影</div>
+          <div class="shadow-grid">
+            <div class="shadow-box" style="box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04)">panel</div>
+            <div class="shadow-box" style="box-shadow: 0 6px 14px rgba(37, 99, 235, 0.26); background: #2563eb; color: #fff">brand glow</div>
+            <div class="shadow-box" style="box-shadow: 12px 0 32px rgba(15, 23, 42, 0.12)">drawer</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="layout">
+        <div class="section-head">
+          <div class="section-index">05</div>
+          <div>
+            <h2>布局与栅格</h2>
+            <p class="section-desc">桌面采用「固定侧边栏 + 弹性内容区」，内容最大宽度 1560px；栅格以 12 列为基础，卡片间距 14px。</p>
+          </div>
+        </div>
+
+        <div class="panel mb-14">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">后台框架</div>
+              <div class="panel-sub">侧栏 232px · 导航 78px · 内容区 28px padding</div>
+            </div>
+          </div>
+          <div style="padding: 16px 20px 20px">
+            <div class="wireframe">
+              <div class="wf-top">
+                <div class="wf-side">
+                  <div class="wf-logo"></div>
+                  <div class="wf-nav on"></div>
+                  <div class="wf-nav"></div>
+                  <div class="wf-nav"></div>
+                  <div class="wf-nav"></div>
+                  <div class="wf-nav"></div>
+                  <div class="wf-nav"></div>
+                </div>
+                <div class="wf-body">
+                  <div class="wf-bar">
+                    <div style="width: 120px"></div>
+                    <div style="width: 54px; margin-left: auto"></div>
+                    <div style="width: 26px; border-radius: 50%"></div>
+                  </div>
+                  <div class="wf-content">
+                    <div class="wf-kpis">
+                      <div class="wf-kpi"></div>
+                      <div class="wf-kpi"></div>
+                      <div class="wf-kpi"></div>
+                      <div class="wf-kpi"></div>
+                    </div>
+                    <div class="wf-charts">
+                      <div class="wf-chart"></div>
+                      <div class="wf-chart"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="wf-annot">
+                <span><b>侧栏</b> 232px / 白底 / 44px 菜单项</span>
+                <span><b>导航</b> 78px / 标题 + 账号</span>
+                <span><b>内容</b> max 1560px / 28px</span>
+                <span><b>栅格</b> 12 列 / gap 14</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 10px">断点策略</div>
+            <div class="token-row"><span class="token-name">≤ 1300px</span><span class="token-value">KPI 四列 → 两列；图表整行堆叠</span></div>
+            <div class="token-row"><span class="token-name">≤ 900px</span><span class="token-value">侧栏改抽屉；导航 64px</span></div>
+            <div class="token-row"><span class="token-name">≤ 768px</span><span class="token-value">工具栏铺满；表格隐藏次要列</span></div>
+            <div class="token-row"><span class="token-name">≤ 768px</span><span class="token-value">抽屉全屏；弹窗 92%；图表 240px</span></div>
+            <div class="token-row"><span class="token-name">移动基准</span><span class="token-value">390 × 844</span></div>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 10px">栅格用法</div>
+            <div class="token-row"><span class="token-name">看板主图</span><span class="token-value">8 / 12</span></div>
+            <div class="token-row"><span class="token-name">看板侧图</span><span class="token-value">4 / 12</span></div>
+            <div class="token-row"><span class="token-name">双栏列表</span><span class="token-value">6 / 6</span></div>
+            <div class="token-row"><span class="token-name">题库维度表</span><span class="token-value">7 / 12</span></div>
+            <div class="token-row"><span class="token-name">题型正确率</span><span class="token-value">5 / 12</span></div>
+            <div class="token-row"><span class="token-name">卡片间距</span><span class="token-value">14px</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="actions">
+        <div class="section-head">
+          <div class="section-index">06</div>
+          <div>
+            <h2>按钮与操作</h2>
+            <p class="section-desc">一个区域只有一个主按钮。主操作用实心蓝，次操作用描边，危险操作使用浅红底或红色文字。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="demo-grid">
+            <div class="demo">
+              <div class="demo-label">主按钮 / 次按钮 / 危险按钮</div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                <button class="btn btn-primary">新建题库</button>
+                <button class="btn btn-default">导入题目</button>
+                <button class="btn btn-danger">批量删除</button>
+                <button class="btn btn-text">查看详情 →</button>
+              </div>
+            </div>
+            <div class="demo">
+              <div class="demo-label">尺寸与禁用态</div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+                <button class="btn btn-primary btn-sm">小按钮</button>
+                <button class="btn btn-primary">默认按钮</button>
+                <button class="btn btn-primary btn-lg">大按钮 / 登录</button>
+                <button class="btn btn-primary" disabled>已禁用</button>
+              </div>
+            </div>
+          </div>
+          <div class="rule-grid" style="margin-top: 14px">
+            <div class="rule do"><b>DO</b>列表页把“新建 / 导入”放在工具栏右侧；行内操作使用文字按钮，右对齐。</div>
+            <div class="rule dont"><b>DON'T</b>同一行放两个实心主按钮；也不要给“取消”加主色，它应该是描边或文字按钮。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="forms">
+        <div class="section-head">
+          <div class="section-index">07</div>
+          <div>
+            <h2>表单控件</h2>
+            <p class="section-desc">控件高度 36px，圆角 8px，聚焦时主色描边 + 3px 柔光环；标签在上，必填用红色星号。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="demo-grid">
+            <div class="demo">
+              <div class="field-label">题库名称 <em>*</em></div>
+              <input class="input" placeholder="例如：教师资格 · 综合素质" />
+              <div style="height: 14px"></div>
+              <div class="field-label">所属分类 <em>*</em></div>
+              <div class="select"><span class="ph">请选择分类</span><span class="chev"></span></div>
+              <div style="height: 14px"></div>
+              <div class="field-label">聚焦态</div>
+              <input class="input focus" value="教师资格" />
+            </div>
+
+            <div class="demo">
+              <div class="field-label">题型</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px">
+                <button class="btn btn-primary btn-sm">单选题</button>
+                <button class="btn btn-default btn-sm">多选题</button>
+                <button class="btn btn-default btn-sm">判断题</button>
+                <button class="btn btn-default btn-sm">填空题</button>
+              </div>
+              <div class="field-label">正确答案</div>
+              <div style="margin-bottom: 16px">
+                <span class="radio on"><i></i>A</span>
+                <span class="radio"><i></i>B</span>
+                <span class="check on"><i></i>选项 C</span>
+              </div>
+              <div class="field-label">上架状态</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: #64748b">
+                <span class="switch"></span>已上架
+                <span class="switch off" style="margin-left: 14px"></span>已下架
+              </div>
+            </div>
+          </div>
+          <div class="note">
+            <span><b>校验：</b>错误文案紧贴控件下方，12px 红色；不要用弹窗承接字段级错误。提交按钮在请求期间显示 loading 并禁用。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tags">
+        <div class="section-head">
+          <div class="section-index">08</div>
+          <div>
+            <h2>标签与状态</h2>
+            <p class="section-desc">题型用固定色，难度用语义色，业务状态用浅底胶囊。标签只表达分类，不承担点击操作。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="demo-grid">
+            <div class="demo">
+              <div class="demo-label">题型标签</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <span class="tag tag-single">单选题</span>
+                <span class="tag tag-multiple">多选题</span>
+                <span class="tag tag-judge">判断题</span>
+                <span class="tag tag-fill">填空题</span>
+              </div>
+              <div class="demo-label" style="margin-top: 20px">难度</div>
+              <div style="display: flex; gap: 8px">
+                <span class="chip chip-success"><i></i>简单</span>
+                <span class="chip chip-warning"><i></i>中等</span>
+                <span class="chip chip-danger"><i></i>困难</span>
+              </div>
+            </div>
+            <div class="demo">
+              <div class="demo-label">业务状态</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <span class="chip chip-success"><i></i>已提交</span>
+                <span class="chip chip-warning"><i></i>进行中</span>
+                <span class="chip chip-danger"><i></i>已禁用</span>
+                <span class="chip chip-info"><i></i>进行中</span>
+                <span class="chip chip-neutral"><i></i>已下架</span>
+              </div>
+              <div class="demo-label" style="margin-top: 20px">知识点标签</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <span class="tag" style="color: #2563eb; background: #eff6ff; border-color: #c7d9fd">职业理念</span>
+                <span class="tag" style="color: #047857; background: #ecfdf5; border-color: #a7f3d0">教育法律法规</span>
+                <span class="tag" style="color: #7c3aed; background: #f5f3ff; border-color: #ddd6fe">教师职业道德</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="cards">
+        <div class="section-head">
+          <div class="section-index">09</div>
+          <div>
+            <h2>卡片与表格</h2>
+            <p class="section-desc">卡片承载“指标 + 说明”，表格承载“可比较的数据”。两者共享 14px 圆角、1px 边框和同一套文字层级。</p>
+          </div>
+        </div>
+
+        <div class="kpis mb-14">
+          <div class="kpi">
+            <div class="kpi-top"><span class="kpi-label">练习用户</span><span class="kpi-icon">用</span></div>
+            <div class="kpi-value">6<span>人</span></div>
+            <div class="kpi-hint">已注册的练习账号</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="kpi-label">题目总量</span><span class="kpi-icon green">题</span></div>
+            <div class="kpi-value">142<span>道</span></div>
+            <div class="kpi-hint">四种题型合计</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="kpi-label">平均正确率</span><span class="kpi-icon orange">率</span></div>
+            <div class="kpi-value">71<span>%</span></div>
+            <div class="kpi-hint">答对题数 / 作答题数</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="kpi-label">待攻克错题</span><span class="kpi-icon red">错</span></div>
+            <div class="kpi-value">145<span>道</span></div>
+            <div class="kpi-hint">错题本中未掌握</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">最近练习</div>
+              <div class="panel-sub">最新提交的练习记录</div>
+            </div>
+            <span class="link">全部记录</span>
+          </div>
+          <div style="padding: 12px 20px 18px">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>用户</th>
+                  <th>题库</th>
+                  <th>模式</th>
+                  <th>题数</th>
+                  <th>正确率</th>
+                  <th style="text-align: right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="strong">小明</td>
+                  <td>教师资格 · 综合素质</td>
+                  <td>章节练习</td>
+                  <td>10</td>
+                  <td style="color: #10b981; font-weight: 600">80%</td>
+                  <td style="text-align: right"><span class="link">详情</span></td>
+                </tr>
+                <tr>
+                  <td class="strong">小红</td>
+                  <td>行测 · 判断推理</td>
+                  <td>随机练习</td>
+                  <td>8</td>
+                  <td style="color: #f59e0b; font-weight: 600">62%</td>
+                  <td style="text-align: right"><span class="link">详情</span></td>
+                </tr>
+                <tr>
+                  <td class="strong">阿强</td>
+                  <td>初级会计 · 经济法基础</td>
+                  <td>错题重做</td>
+                  <td>12</td>
+                  <td style="color: #ef4444; font-weight: 600">42%</td>
+                  <td style="text-align: right"><span class="link">详情</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="display: flex; justify-content: flex-end; margin-top: 14px">
+              <div class="pager">
+                <span>共 98 条</span>
+                <span class="pg">‹</span>
+                <span class="pg on">1</span>
+                <span class="pg">2</span>
+                <span class="pg">3</span>
+                <span class="pg">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rule-grid" style="margin-top: 14px">
+          <div class="rule do"><b>DO</b>表格首列放主体（用户 / 题库 / 题目），数值列居中，操作列右对齐并固定在右侧。</div>
+          <div class="rule dont"><b>DON'T</b>不要给表格加斑马纹和粗边框；不要把所有列都设成相同宽度，主体列应更宽。</div>
+        </div>
+      </section>
+
+      <section class="section" id="feedback">
+        <div class="section-head">
+          <div class="section-index">10</div>
+          <div>
+            <h2>抽屉、弹窗与空态</h2>
+            <p class="section-desc">轻量编辑用右侧抽屉，确认与短表单用弹窗；空态必须给出下一步操作。</p>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="drawer-demo">
+            <div class="drawer-head"><span>新建题库</span><span class="close-x">×</span></div>
+            <div class="drawer-body">
+              <div class="field-label">所属分类 <em>*</em></div>
+              <div class="select"><span class="ph">请选择分类</span><span class="chev"></span></div>
+              <div style="height: 12px"></div>
+              <div class="field-label">题库名称 <em>*</em></div>
+              <input class="input" placeholder="例如：教师资格 · 综合素质" />
+              <div style="height: 12px"></div>
+              <div class="field-label">题库简介</div>
+              <div class="input" style="height: 64px; align-items: flex-start; padding-top: 9px">
+                <span class="ph">介绍覆盖范围与适用人群</span>
+              </div>
+            </div>
+            <div class="drawer-foot">
+              <button class="btn btn-default btn-sm">取消</button>
+              <button class="btn btn-primary btn-sm">保存</button>
+            </div>
+          </div>
+
+          <div class="panel panel-pad" style="display: flex; flex-direction: column; justify-content: center">
+            <div class="empty">
+              <div class="empty-ring"></div>
+              <div class="empty-text">还没有练习记录</div>
+              <div style="margin-top: 14px"><button class="btn btn-default btn-sm">去题库练一题</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">
+          <span><b>尺寸：</b>抽屉桌面 440–720px、手机 100%；弹窗桌面 480–780px、手机 92%；抽屉底部操作固定，内容区独立滚动。</span>
+        </div>
+      </section>
+
+      <section class="section" id="charts">
+        <div class="section-head">
+          <div class="section-index">11</div>
+          <div>
+            <h2>数据可视化</h2>
+            <p class="section-desc">图表只保留必要网格线；标题在卡片头部，图例靠右；正确率等比例数据始终使用 0–100% 轴。</p>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="panel">
+            <div class="chart-box">
+              <div class="chart-head">
+                <div>
+                  <div class="chart-title">练习趋势</div>
+                  <div class="chart-sub">近 14 天练习次数与正确率</div>
+                </div>
+                <div class="legend">
+                  <span><i style="background: #2563eb"></i>练习次数</span>
+                  <span><i style="background: #10b981"></i>正确率</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 420 200" width="100%" height="200" role="img" aria-label="练习趋势示例图">
+                <g stroke="#f1f5f9" stroke-width="1">
+                  <line x1="36" y1="20" x2="392" y2="20" />
+                  <line x1="36" y1="60" x2="392" y2="60" />
+                  <line x1="36" y1="100" x2="392" y2="100" />
+                  <line x1="36" y1="140" x2="392" y2="140" />
+                  <line x1="36" y1="176" x2="392" y2="176" />
+                </g>
+                <g fill="#93b4fa">
+                  <rect x="48" y="120" width="14" height="56" rx="4" />
+                  <rect x="72" y="104" width="14" height="72" rx="4" />
+                  <rect x="96" y="112" width="14" height="64" rx="4" />
+                  <rect x="120" y="88" width="14" height="88" rx="4" />
+                  <rect x="144" y="96" width="14" height="80" rx="4" />
+                  <rect x="168" y="72" width="14" height="104" rx="4" />
+                  <rect x="192" y="84" width="14" height="92" rx="4" />
+                  <rect x="216" y="64" width="14" height="112" rx="4" />
+                  <rect x="240" y="76" width="14" height="100" rx="4" />
+                  <rect x="264" y="56" width="14" height="120" rx="4" />
+                  <rect x="288" y="68" width="14" height="108" rx="4" />
+                  <rect x="312" y="48" width="14" height="128" rx="4" />
+                  <rect x="336" y="60" width="14" height="116" rx="4" />
+                  <rect x="360" y="52" width="14" height="124" rx="4" />
+                </g>
+                <polyline
+                  points="55,96 79,88 103,100 127,78 151,86 175,70 199,82 223,64 247,74 271,58 295,68 319,50 343,62 367,54"
+                  fill="none"
+                  stroke="#10b981"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                />
+                <g fill="#94a3b8" font-size="9" font-family="Inter, sans-serif">
+                  <text x="10" y="24">6</text>
+                  <text x="10" y="64">4</text>
+                  <text x="10" y="104">3</text>
+                  <text x="10" y="144">1</text>
+                  <text x="10" y="180">0</text>
+                  <text x="48" y="194">10/5</text>
+                  <text x="168" y="194">10/11</text>
+                  <text x="288" y="194">10/17</text>
+                </g>
+                <g fill="#94a3b8" font-size="9" font-family="Inter, sans-serif" text-anchor="end">
+                  <text x="414" y="24">100%</text>
+                  <text x="414" y="64">70%</text>
+                  <text x="414" y="104">50%</text>
+                  <text x="414" y="144">20%</text>
+                  <text x="414" y="180">0%</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="chart-box">
+              <div class="chart-head">
+                <div>
+                  <div class="chart-title">题型分布</div>
+                  <div class="chart-sub">按累计作答量统计</div>
+                </div>
+              </div>
+              <svg viewBox="0 0 420 200" width="100%" height="200" role="img" aria-label="题型分布示例图">
+                <g transform="translate(190,100)">
+                  <circle r="62" fill="none" stroke="#f1f5f9" stroke-width="26" />
+                  <circle r="62" fill="none" stroke="#2563eb" stroke-width="26" stroke-dasharray="140 250" transform="rotate(-90)" />
+                  <circle r="62" fill="none" stroke="#7c3aed" stroke-width="26" stroke-dasharray="62 328" transform="rotate(72)" />
+                  <circle r="62" fill="none" stroke="#0891b2" stroke-width="26" stroke-dasharray="48 342" transform="rotate(142)" />
+                  <circle r="62" fill="none" stroke="#f59e0b" stroke-width="26" stroke-dasharray="52 338" transform="rotate(205)" />
+                  <text x="0" y="2" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">739</text>
+                  <text x="0" y="20" text-anchor="middle" font-size="9" fill="#94a3b8">累计作答</text>
+                </g>
+                <g font-size="10" fill="#64748b">
+                  <rect x="300" y="52" width="8" height="8" rx="2" fill="#2563eb" /><text x="314" y="60">单选题</text>
+                  <rect x="300" y="76" width="8" height="8" rx="2" fill="#7c3aed" /><text x="314" y="84">多选题</text>
+                  <rect x="300" y="100" width="8" height="8" rx="2" fill="#0891b2" /><text x="314" y="108">判断题</text>
+                  <rect x="300" y="124" width="8" height="8" rx="2" fill="#f59e0b" /><text x="314" y="132">填空题</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad" style="margin-top: 14px">
+          <div class="panel-title" style="margin-bottom: 10px">图表规则</div>
+          <div class="token-row"><span class="token-name">网格线</span><span class="token-value">#F1F5F9 / 1px / 仅横向</span></div>
+          <div class="token-row"><span class="token-name">坐标轴文字</span><span class="token-value">#94A3B8 / 9–11px</span></div>
+          <div class="token-row"><span class="token-name">柱宽</span><span class="token-value">12–14px / 圆角 4–5px</span></div>
+          <div class="token-row"><span class="token-name">折线</span><span class="token-value">2–2.4px / smooth / 不显示数据点</span></div>
+          <div class="token-row"><span class="token-name">图例</span><span class="token-value">右上 / 10px / 方块 9×9</span></div>
+          <div class="token-row"><span class="token-name">移动端</span><span class="token-value">隐藏轴名称 / 图例缩至 10px</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="mobile">
+        <div class="section-head">
+          <div class="section-index">12</div>
+          <div>
+            <h2>移动端规则</h2>
+            <p class="section-desc">手机端不是桌面的缩小版：侧栏收进抽屉，表格收敛到 3–4 列，表单全屏，操作落到底部。</p>
+          </div>
+        </div>
+
+        <div class="grid g2" style="align-items: start">
+          <div style="display: flex; justify-content: center">
+            <div>
+              <div class="phone">
+                <div class="phone-notch"><i></i></div>
+                <div class="phone-bar">
+                  <span class="phone-menu">≡</span>
+                  <span class="phone-title">数据看板</span>
+                  <span class="phone-avatar">超</span>
+                </div>
+                <div class="phone-body">
+                  <div class="phone-kpis">
+                    <div class="phone-kpi"><span>练习用户</span><b>6 <small style="font-size: 7px; color: #94a3b8">人</small></b></div>
+                    <div class="phone-kpi"><span>题目总量</span><b>142 <small style="font-size: 7px; color: #94a3b8">道</small></b></div>
+                    <div class="phone-kpi"><span>平均正确率</span><b>71 <small style="font-size: 7px; color: #94a3b8">%</small></b></div>
+                    <div class="phone-kpi"><span>待攻克错题</span><b>145 <small style="font-size: 7px; color: #94a3b8">道</small></b></div>
+                  </div>
+                  <div style="background: #fff; border-radius: 10px; padding: 9px 10px; margin-bottom: 8px">
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                      <div style="font-size: 9px; font-weight: 600">最近练习</div>
+                      <div style="font-size: 7px; color: #94a3b8">全部</div>
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-top: 7px; font-size: 7px; color: #94a3b8">
+                      <span style="flex: 1">用户</span><span style="flex: 2">题库</span><span>正确率</span>
+                    </div>
+                  </div>
+                  <div class="phone-row"><div><b>小明</b><span>教师资格 · 综合素质</span></div><em>80%</em></div>
+                  <div class="phone-row"><div><b>小红</b><span>行测 · 判断推理</span></div><em style="color: #f59e0b">62%</em></div>
+                  <div class="phone-row"><div><b>阿强</b><span>初级会计 · 经济法基础</span></div><em style="color: #ef4444">42%</em></div>
+                </div>
+              </div>
+              <div class="phone-caption">390 × 844 · 两列 KPI · 三列表格</div>
+            </div>
+          </div>
+
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 10px">关键规则</div>
+            <div class="token-row"><span class="token-name">侧边栏</span><span class="token-value">抽屉 268px + 遮罩</span></div>
+            <div class="token-row"><span class="token-name">导航高度</span><span class="token-value">64px</span></div>
+            <div class="token-row"><span class="token-name">内容边距</span><span class="token-value">12px + 安全区</span></div>
+            <div class="token-row"><span class="token-name">表格列</span><span class="token-value">保留主体 + 关键指标 + 操作</span></div>
+            <div class="token-row"><span class="token-name">抽屉</span><span class="token-value">100% 宽</span></div>
+            <div class="token-row"><span class="token-name">弹窗</span><span class="token-value">92% 宽 / 距顶 5vh</span></div>
+            <div class="token-row"><span class="token-name">图表高度</span><span class="token-value">240px / 隐藏轴名称</span></div>
+            <div class="token-row"><span class="token-name">触控热区</span><span class="token-value">≥ 44 × 44px</span></div>
+            <div class="token-row"><span class="token-name">按钮</span><span class="token-value">底部通栏 / 主操作在右</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="a11y">
+        <div class="section-head">
+          <div class="section-index">13</div>
+          <div>
+            <h2>可用性与可访问性</h2>
+            <p class="section-desc">对比度、焦点、动效与文案密度，是这套规范在真实项目中不出问题的底线。</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="token-row"><span class="token-name">主文字 / 白底</span><span class="token-value">#0F172A · 17.9:1 · AAA</span></div>
+          <div class="token-row"><span class="token-name">辅助文字 / 白底</span><span class="token-value">#64748B · 4.8:1 · AA</span></div>
+          <div class="token-row"><span class="token-name">白字 / 主色按钮</span><span class="token-value">#FFFFFF on #2563EB · 5.2:1 · AA</span></div>
+          <div class="token-row"><span class="token-name">弱提示 / 白底</span><span class="token-value">#94A3B8 · 2.6:1 · 仅辅助信息</span></div>
+          <div class="token-row"><span class="token-name">焦点态</span><span class="token-value">主色描边 + 3px rgba(37,99,235,.12)</span></div>
+          <div class="token-row"><span class="token-name">动效</span><span class="token-value">0.2s ease；尊重 reduced-motion</span></div>
+        </div>
+
+        <div class="rule-grid" style="margin-top: 14px">
+          <div class="rule do"><b>DO</b>状态同时用颜色 + 文案表达；图表提供数值标签；移动端热区不小于 44px。</div>
+          <div class="rule dont"><b>DON'T</b>不要只用颜色区分对错；不要把 #94A3B8 用在正文；不要用弹窗展示字段级校验。</div>
+        </div>
+      </section>
+
+      <section class="section" id="code">
+        <div class="section-head">
+          <div class="section-index">14</div>
+          <div>
+            <h2>工程接入</h2>
+            <p class="section-desc">
+              <code>tokens.css</code> 提供全部变量，<code>components.css</code> 提供组件类；Element Plus 项目会自动映射主题色与圆角。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14">
+          <div class="panel-title" style="margin-bottom: 10px">1. 引入令牌与组件</div>
+          <pre><code>/* main.js / main.ts */
+import './styles/tokens.css';      /* 变量层 */
+import './styles/components.css';  /* 组件层：ui- 前缀 */
+import './styles/app.css';         /* 业务层：只做组合 */
+
+/* 业务样式只引用变量 */
+.panel {
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+}</code></pre>
+        </div>
+
+        <div class="grid g2">
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 10px">2. Tailwind 映射</div>
+            <div class="code-wrap">
+              <button class="copy-btn" type="button" data-copy="tailwind-code">复制</button>
+              <pre id="tailwind-code"><code>// tailwind.config.js
+theme: {
+  extend: {
+    colors: {
+      brand: {
+        100: '#EFF6FF',
+        400: '#5B8BF5',
+        600: '#2563EB',
+        700: '#1D4ED8'
+      },
+      surface: '#FFFFFF',
+      canvas: '#F4F6FB'
+    },
+    borderRadius: { lg: '14px', md: '10px' },
+    boxShadow: {
+      card: '0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.04)'
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title" style="margin-bottom: 10px">3. 断点约定</div>
+            <pre><code>/* 与现有后台保持一致 */
+@media (max-width: 1300px) { /* KPI 两列 */ }
+@media (max-width: 900px)  { /* 侧栏抽屉 */ }
+@media (max-width: 768px)  { /* 表单/表格移动态 */ }
+
+/* 移动端基准视口 */
+/* 390 × 844 */</code></pre>
+          </div>
+        </div>
+
+        <div class="panel panel-pad" style="margin-top: 14px">
+          <div class="panel-title" style="margin-bottom: 10px">4. 使用约束</div>
+          <div class="token-row"><span class="token-name">颜色</span><span class="token-value">禁止在业务代码写死 hex，统一引用 --ui-*</span></div>
+          <div class="token-row"><span class="token-name">圆角</span><span class="token-value">面板 14 / 控件 8 / 标签 6，不新增中间值</span></div>
+          <div class="token-row"><span class="token-name">字号</span><span class="token-value">正文 13–14 / 辅助 12 / 微文案 11</span></div>
+          <div class="token-row"><span class="token-name">阴影</span><span class="token-value">一个页面不超过 2 种阴影</span></div>
+          <div class="token-row"><span class="token-name">主色</span><span class="token-value">仅主操作、链接、选中态、关键数字</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="kit">
+        <div class="section-head">
+          <div class="section-index">15</div>
+          <div>
+            <h2>组件资产</h2>
+            <p class="section-desc">
+              除令牌外，另交付一套零依赖组件样式 <code>components.css</code>：类名统一 <code>ui-</code> 前缀，与 Element Plus、Tailwind 均不冲突。本页下方的组件示例直接引用该文件，看到的效果就是复制到项目后的效果。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap">
+          <div>
+            <div class="panel-title">完整可视化报告</div>
+            <p class="section-desc" style="margin-top: 3px">
+              14 页报告：令牌构成、组件覆盖矩阵、关键组件全状态、响应式策略、可访问性与落地清单，可直接导出 PDF 传阅。
+            </p>
+          </div>
+          <a class="btn btn-primary" href="report.html" target="_blank" rel="noopener" style="text-decoration: none">打开可视化报告 →</a>
+        </div>
+
+        <div class="grid g2 mb-14">
+          <div class="panel panel-pad">
+            <div class="panel-title">components.css 覆盖什么</div>
+            <p class="section-desc" style="margin-bottom: 8px">
+              25 个组件、3 档尺寸、5 类状态，全部只消费 <code>--ui-*</code> 变量，不含 JS，不绑定框架。
+            </p>
+            <div class="token-row"><span class="token-name">基础</span><span class="token-value">按钮、输入、下拉、文本域、复选、单选、开关</span></div>
+            <div class="token-row"><span class="token-name">数据</span><span class="token-value">卡片、指标卡、描述列表、表格、工具栏、分页</span></div>
+            <div class="token-row"><span class="token-name">反馈</span><span class="token-value">空态、提示条、骨架屏、进度条、加载指示</span></div>
+            <div class="token-row"><span class="token-name">浮层</span><span class="token-value">抽屉、弹窗、遮罩、标签页、分段控件</span></div>
+            <div class="token-row"><span class="token-name">标记</span><span class="token-value">题型标签、难度标签、状态胶囊、头像</span></div>
+          </div>
+          <div class="panel panel-pad">
+            <div class="panel-title">与 Element Plus 的关系</div>
+            <p class="section-desc" style="margin-bottom: 8px">
+              不替代、不重绘。两种用法按项目现状选择：
+            </p>
+            <div class="token-row"><span class="token-name">已用 El Plus</span><span class="token-value">根容器加 <code>ui-scope</code>，统一表头、抽屉、分页的尺寸密度</span></div>
+            <div class="token-row"><span class="token-name">原生 / 自研</span><span class="token-value">直接用 <code>ui-</code> 类，无需引入组件库</span></div>
+            <div class="token-row"><span class="token-name">Tailwind 项目</span><span class="token-value">用 tokens 生成 theme，组件类按需取舍</span></div>
+            <div class="token-row"><span class="token-name">小程序 / 移动端</span><span class="token-value">复用数值与状态规则，类名改为 rpx 实现</span></div>
+            <div class="note" style="margin-top: 12px">
+              <span><b>约定：</b><code>components.css</code> 不写 <code>!important</code>，不覆盖 <code>.el-*</code> 全局样式，只在 <code>.ui-scope</code> 内做密度修正。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14">
+          <div class="panel-title" style="margin-bottom: 12px">组件清单（类名即 API）</div>
+          <div class="table-wrap">
+          <table class="table table--wide">
+            <thead>
+              <tr>
+                <th style="width: 108px">组件</th>
+                <th>基础类</th>
+                <th style="width: 210px">主要变体</th>
+                <th style="width: 150px">尺寸</th>
+                <th style="width: 150px">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>按钮</td><td class="strong">.ui-btn</td><td>primary / default / danger / text / ghost</td><td>sm 30 · md 36 · lg 44</td><td>hover / active / disabled / loading</td></tr>
+              <tr><td>输入框</td><td class="strong">.ui-input</td><td>基础 / 搜索（.ui-search）</td><td>md 36 · sm 30</td><td>hover / focus / error / disabled</td></tr>
+              <tr><td>下拉 / 文本域</td><td class="strong">.ui-select / .ui-textarea</td><td>—</td><td>md 36 · sm 30</td><td>focus / disabled</td></tr>
+              <tr><td>字段容器</td><td class="strong">.ui-field</td><td>label / hint / error</td><td>—</td><td>is-error</td></tr>
+              <tr><td>复选 / 单选</td><td class="strong">.ui-choice</td><td>--radio</td><td>16px 控件</td><td>checked / focus / disabled</td></tr>
+              <tr><td>开关</td><td class="strong">.ui-switch</td><td>—</td><td>36 × 20</td><td>on / off / disabled</td></tr>
+              <tr><td>标签</td><td class="strong">.ui-tag</td><td>题型 4 色 / 难度 3 色 / 语义 6 色</td><td>默认 · sm</td><td>静态</td></tr>
+              <tr><td>状态胶囊</td><td class="strong">.ui-chip</td><td>success / warning / danger / info / brand</td><td>—</td><td>静态</td></tr>
+              <tr><td>卡片 / 页头</td><td class="strong">.ui-card / .ui-page-head</td><td>head / body / foot / flush</td><td>—</td><td>—</td></tr>
+              <tr><td>指标卡</td><td class="strong">.ui-stat</td><td>brand</td><td>—</td><td>—</td></tr>
+              <tr><td>表格</td><td class="strong">.ui-table</td><td>compact / num / actions</td><td>—</td><td>hover / empty</td></tr>
+              <tr><td>工具栏 / 分页</td><td class="strong">.ui-toolbar / .ui-pager</td><td>left / right / info</td><td>30px 页码</td><td>active / disabled</td></tr>
+              <tr><td>空态 / 提示</td><td class="strong">.ui-empty / .ui-alert</td><td>success / warning / danger / neutral</td><td>—</td><td>—</td></tr>
+              <tr><td>抽屉 / 弹窗</td><td class="strong">.ui-drawer / .ui-modal</td><td>右侧 / --left</td><td>460 / 380 / 100%</td><td>is-open</td></tr>
+              <tr><td>标签页 / 分段</td><td class="strong">.ui-tabs / .ui-segment</td><td>—</td><td>—</td><td>is-active</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="panel panel-pad mb-14">
+          <div class="panel-title" style="margin-bottom: 6px">实际渲染</div>
+          <p class="section-desc" style="margin-bottom: 16px">以下区块未使用本页的展示样式，全部由 <code>components.css</code> 渲染，可直接对照取用。</p>
+
+          <div class="ui-stat-grid">
+            <div class="ui-stat">
+              <div class="ui-stat__label">题目总数</div>
+              <div class="ui-stat__value">142<span class="ui-stat__unit">道</span></div>
+              <div class="ui-stat__foot"><span>覆盖 4 个题库</span><span class="ui-stat__trend ui-stat__trend--up">+12</span></div>
+            </div>
+            <div class="ui-stat">
+              <div class="ui-stat__label">练习次数</div>
+              <div class="ui-stat__value">98<span class="ui-stat__unit">次</span></div>
+              <div class="ui-stat__foot"><span>近 14 天</span><span class="ui-stat__trend ui-stat__trend--up">+8.4%</span></div>
+            </div>
+            <div class="ui-stat">
+              <div class="ui-stat__label">平均正确率</div>
+              <div class="ui-stat__value">76.5<span class="ui-stat__unit">%</span></div>
+              <div class="ui-stat__foot"><span>较上周</span><span class="ui-stat__trend ui-stat__trend--down">-1.2%</span></div>
+            </div>
+          </div>
+
+          <div style="height: 14px"></div>
+
+          <section class="ui-card">
+            <div class="ui-toolbar">
+              <div class="ui-toolbar__left">
+                <div class="ui-search"><input class="ui-input" placeholder="搜索题库名称" /></div>
+                <select class="ui-select" style="width: 140px">
+                  <option>全部分类</option>
+                  <option>职业资格</option>
+                </select>
+              </div>
+              <div class="ui-toolbar__right">
+                <button class="ui-btn ui-btn--default">批量导入</button>
+                <button class="ui-btn ui-btn--primary">新建题库</button>
+              </div>
+            </div>
+            <div class="ui-table-wrap">
+              <table class="ui-table">
+                <thead>
+                  <tr>
+                    <th>题库</th>
+                    <th>分类</th>
+                    <th class="ui-table__num">题量</th>
+                    <th>状态</th>
+                    <th class="ui-table__actions">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="ui-table__main">
+                      <div class="ui-table__strong">教师资格 · 综合素质</div>
+                      <div class="ui-table__sub">5 个章节 · 48 道题</div>
+                    </td>
+                    <td><span class="ui-tag ui-tag--neutral">职业资格</span></td>
+                    <td class="ui-table__num">48</td>
+                    <td><span class="ui-chip ui-chip--success"><i class="ui-chip__dot"></i>已上架</span></td>
+                    <td class="ui-table__actions"><button class="ui-link">编辑</button><button class="ui-link">章节</button></td>
+                  </tr>
+                  <tr>
+                    <td class="ui-table__main">
+                      <div class="ui-table__strong">行测 · 判断推理</div>
+                      <div class="ui-table__sub">4 个章节 · 36 道题</div>
+                    </td>
+                    <td><span class="ui-tag ui-tag--neutral">公务员</span></td>
+                    <td class="ui-table__num">36</td>
+                    <td><span class="ui-chip ui-chip--neutral"><i class="ui-chip__dot"></i>已下架</span></td>
+                    <td class="ui-table__actions"><button class="ui-link">编辑</button><button class="ui-link is-danger">删除</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="ui-pager">
+              <span class="ui-pager__info">共 4 个题库</span>
+              <button class="ui-pager__btn" disabled>上一页</button>
+              <button class="ui-pager__btn is-active">1</button>
+              <button class="ui-pager__btn">2</button>
+              <button class="ui-pager__btn">下一页</button>
+            </div>
+          </section>
+
+          <div style="height: 14px"></div>
+
+          <div class="grid g2">
+            <section class="ui-card">
+              <div class="ui-card__head">
+                <div>
+                  <h3 class="ui-card__title">空态</h3>
+                  <div class="ui-card__subtitle">说明原因 + 下一步</div>
+                </div>
+              </div>
+              <div class="ui-card__body ui-card__body--flush">
+                <div class="ui-empty">
+                  <div class="ui-empty__icon">?</div>
+                  <div class="ui-empty__title">还没有错题</div>
+                  <div class="ui-empty__desc">完成章节练习后，答错的题目会自动收进这里。</div>
+                  <div class="ui-empty__actions">
+                    <button class="ui-btn ui-btn--primary ui-btn--sm">去练习</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="ui-card">
+              <div class="ui-card__head">
+                <div>
+                  <h3 class="ui-card__title">状态与反馈</h3>
+                  <div class="ui-card__subtitle">按钮 / 标签 / 提示 / 进度</div>
+                </div>
+                <div class="ui-card__extra"><span class="ui-chip ui-chip--brand">示例</span></div>
+              </div>
+              <div class="ui-card__body">
+                <div class="ui-btn-group">
+                  <button class="ui-btn ui-btn--primary ui-btn--sm">保存</button>
+                  <button class="ui-btn ui-btn--default ui-btn--sm">取消</button>
+                  <button class="ui-btn ui-btn--danger ui-btn--sm">删除</button>
+                  <button class="ui-btn ui-btn--text ui-btn--sm">查看</button>
+                </div>
+                <div class="ui-btn-group" style="margin-top: 12px">
+                  <span class="ui-tag ui-tag--single">单选题</span>
+                  <span class="ui-tag ui-tag--multiple">多选题</span>
+                  <span class="ui-tag ui-tag--judge">判断题</span>
+                  <span class="ui-tag ui-tag--fill">填空题</span>
+                  <span class="ui-tag ui-tag--easy">简单</span>
+                  <span class="ui-tag ui-tag--medium">中等</span>
+                  <span class="ui-tag ui-tag--hard">困难</span>
+                </div>
+                <div class="ui-alert ui-alert--warning" style="margin-top: 12px">
+                  该题库下仍有 12 道题未归类，建议先补充知识点再上架。
+                </div>
+                <div style="margin-top: 12px">
+                  <div class="ui-stat__foot" style="margin: 0 0 6px"><span>本章节正确率</span><span class="ui-num">82%</span></div>
+                  <div class="ui-progress"><div class="ui-progress__bar" style="width: 82%"></div></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="panel-title" style="margin-bottom: 10px">复制即用</div>
+          <pre><code>&lt;!-- 列表页：页头 + 卡片 + 工具栏 + 表格 + 分页 --&gt;
+&lt;div class="ui-page"&gt;
+  &lt;div class="ui-page-head"&gt;
+    &lt;div&gt;
+      &lt;h1 class="ui-page-head__title"&gt;题库管理&lt;/h1&gt;
+      &lt;p class="ui-page-head__desc"&gt;共 4 个题库，142 道题&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="ui-page-head__actions"&gt;
+      &lt;button class="ui-btn ui-btn--primary"&gt;新建题库&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;section class="ui-card"&gt;
+    &lt;div class="ui-toolbar"&gt;
+      &lt;div class="ui-toolbar__left"&gt;
+        &lt;div class="ui-search"&gt;&lt;input class="ui-input" placeholder="搜索" /&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="ui-toolbar__right"&gt;
+        &lt;button class="ui-btn ui-btn--default"&gt;导入&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="ui-table-wrap"&gt;&lt;table class="ui-table"&gt;...&lt;/table&gt;&lt;/div&gt;
+    &lt;div class="ui-pager"&gt;...&lt;/div&gt;
+  &lt;/section&gt;
+&lt;/div&gt;
+
+// 已使用 Element Plus：加一个根类即可对齐密度
+&lt;div class="ui-scope"&gt; ... &lt;/div&gt;</code></pre>
+        </div>
+      </section>
+
+      <div class="foot">
+        <span>练题云 UI 设计规范 · v1.0 · 2026-10-18</span>
+        <span>配套文件：tokens.css · components.css · 组件规范.md · UI设计规范.md</span>
+      </div>
+    </main>
+
+    <script>
+      const links = Array.from(document.querySelectorAll('.nav a'));
+      const sections = links
+        .map((link) => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
+
+      function setActive(id) {
+        links.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (visible) setActive(visible.target.id);
+          },
+          { rootMargin: '-10% 0px -70% 0px', threshold: [0, 0.2, 0.6] }
+        );
+        sections.forEach((section) => observer.observe(section));
+      }
+
+      document.querySelectorAll('.copy-btn').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const target = document.getElementById(btn.dataset.copy);
+          if (!target) return;
+          try {
+            await navigator.clipboard.writeText(target.innerText);
+            btn.textContent = '已复制';
+            setTimeout(() => (btn.textContent = '复制'), 1500);
+          } catch (err) {
+            btn.textContent = '请手动复制';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

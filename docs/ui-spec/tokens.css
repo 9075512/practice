@@ -1,0 +1,296 @@
+/* ============================================================
+   练题云 UI Design Tokens · v1.0
+   适用：中后台 / 数据看板 / 题库与内容管理类 Web 应用
+   主题：Light（浅色）
+   用法：在项目入口最先引入本文件，业务样式只引用变量，不写死色值
+   ============================================================ */
+
+:root {
+  /* ---------- 品牌色 ---------- */
+  --ui-brand-50: #f5f9ff;
+  --ui-brand-100: #eff6ff;
+  --ui-brand-200: #c7d9fd;
+  --ui-brand-300: #93b4fa;
+  --ui-brand-400: #5b8bf5;
+  --ui-brand-500: #3b82f6;
+  --ui-brand-600: #2563eb;
+  --ui-brand-700: #1d4ed8;
+  --ui-brand-800: #1e40af;
+
+  --ui-primary: var(--ui-brand-600);
+  --ui-primary-hover: var(--ui-brand-400);
+  --ui-primary-active: var(--ui-brand-700);
+  --ui-primary-soft: var(--ui-brand-100);
+
+  /* ---------- 中性色 ---------- */
+  --ui-bg: #f4f6fb;
+  --ui-bg-subtle: #f8fafc;
+  --ui-surface: #ffffff;
+  --ui-surface-hover: #f8fbff;
+  --ui-text: #0f172a;
+  --ui-text-secondary: #475569;
+  --ui-text-muted: #64748b;
+  --ui-text-subtle: #94a3b8;
+  --ui-text-disabled: #cbd5e1;
+  --ui-border: #e5e9f2;
+  --ui-border-soft: #eef2f7;
+  --ui-divider: #f1f5f9;
+  --ui-table-head: #f8fafc;
+  --ui-mask: rgba(15, 23, 42, 0.42);
+
+  /* ---------- 语义色 ---------- */
+  --ui-success: #10b981;
+  --ui-success-soft: #ecfdf5;
+  --ui-success-border: #a7f3d0;
+  --ui-success-text: #047857;
+  --ui-success-strong: #d1fae5;
+
+  --ui-warning: #f59e0b;
+  --ui-warning-soft: #fffbeb;
+  --ui-warning-border: #fef3c7;
+  --ui-warning-text: #b45309;
+
+  --ui-danger: #ef4444;
+  --ui-danger-soft: #fef2f2;
+  --ui-danger-border: #fecaca;
+  --ui-danger-text: #b91c1c;
+  --ui-danger-strong: #fee2e2;
+
+  --ui-info: #0891b2;
+  --ui-info-soft: #ecfeff;
+  --ui-info-border: #a5f3fc;
+  --ui-info-text: #0e7490;
+
+  --ui-purple: #7c3aed;
+  --ui-purple-soft: #f5f3ff;
+  --ui-purple-border: #ddd6fe;
+  --ui-purple-text: #6d28d9;
+
+  --ui-orange: #ea580c;
+  --ui-orange-soft: #fff7ed;
+  --ui-orange-border: #fed7aa;
+  --ui-orange-text: #c2410c;
+
+  /* ---------- 图表色 ---------- */
+  --ui-chart-1: #2563eb;
+  --ui-chart-2: #0ea5e9;
+  --ui-chart-3: #10b981;
+  --ui-chart-4: #f59e0b;
+  --ui-chart-5: #ef4444;
+  --ui-chart-6: #8b5cf6;
+  --ui-chart-7: #14b8a6;
+  --ui-chart-8: #f97316;
+
+  /* ---------- 业务语义色（可按项目替换） ---------- */
+  --ui-type-single: #2563eb;
+  --ui-type-multiple: #7c3aed;
+  --ui-type-judge: #0891b2;
+  --ui-type-fill: #ea580c;
+  --ui-level-easy: #10b981;
+  --ui-level-medium: #f59e0b;
+  --ui-level-hard: #ef4444;
+
+  /* ---------- 字体 ---------- */
+  --ui-font-sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --ui-text-xs: 11px;
+  --ui-text-sm: 12px;
+  --ui-text-base: 13px;
+  --ui-text-md: 14px;
+  --ui-text-lg: 15px;
+  --ui-text-xl: 20px;
+  --ui-text-2xl: 22px;
+  --ui-text-display: 40px;
+
+  --ui-weight-regular: 400;
+  --ui-weight-medium: 500;
+  --ui-weight-semibold: 600;
+  --ui-weight-bold: 650;
+  --ui-weight-heavy: 700;
+
+  --ui-leading-tight: 1.2;
+  --ui-leading-normal: 1.5;
+  --ui-leading-relaxed: 1.7;
+
+  /* ---------- 间距（4 的倍数为主） ---------- */
+  --ui-space-1: 4px;
+  --ui-space-2: 6px;
+  --ui-space-3: 8px;
+  --ui-space-4: 10px;
+  --ui-space-5: 12px;
+  --ui-space-6: 14px;
+  --ui-space-7: 16px;
+  --ui-space-8: 18px;
+  --ui-space-9: 20px;
+  --ui-space-10: 24px;
+  --ui-space-11: 28px;
+  --ui-space-12: 32px;
+  --ui-space-13: 40px;
+  --ui-space-14: 60px;
+
+  /* ---------- 圆角 ---------- */
+  --ui-radius-xs: 6px;
+  --ui-radius-sm: 8px;
+  --ui-radius-md: 10px;
+  --ui-radius-lg: 14px;
+  --ui-radius-xl: 18px;
+  --ui-radius-pill: 999px;
+  --ui-radius-circle: 50%;
+
+  /* ---------- 阴影 ---------- */
+  --ui-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+  --ui-shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.03), 0 8px 22px rgba(15, 23, 42, 0.035);
+  --ui-shadow-brand: 0 6px 14px rgba(37, 99, 235, 0.26);
+  --ui-shadow-drawer: 12px 0 32px rgba(15, 23, 42, 0.12);
+  --ui-shadow-bottom-bar: 0 -6px 24px rgba(15, 23, 42, 0.05);
+
+  /* ---------- 布局 ---------- */
+  --ui-sidebar-width: 232px;
+  --ui-sidebar-mobile-width: 268px;
+  --ui-navbar-height: 78px;
+  --ui-navbar-mobile-height: 64px;
+  --ui-content-max: 1560px;
+  --ui-page-gap: 18px;
+  --ui-grid-gap: 14px;
+
+  /* ---------- 动效 ---------- */
+  --ui-duration-fast: 0.16s;
+  --ui-duration: 0.2s;
+  --ui-duration-slow: 0.25s;
+  --ui-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ui-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* ---------- 层级 ---------- */
+  --ui-z-navbar: 10;
+  --ui-z-mask: 90;
+  --ui-z-drawer: 100;
+  --ui-z-toast: 1000;
+
+  /* ---------- Element Plus 映射（使用 Element Plus 时保留） ---------- */
+  --el-color-primary: var(--ui-brand-600);
+  --el-color-primary-light-3: var(--ui-brand-400);
+  --el-color-primary-light-5: var(--ui-brand-300);
+  --el-color-primary-light-7: var(--ui-brand-200);
+  --el-color-primary-light-9: var(--ui-brand-100);
+  --el-border-radius-base: var(--ui-radius-sm);
+  --el-font-family: var(--ui-font-sans);
+  --el-text-color-primary: var(--ui-text);
+  --el-text-color-regular: var(--ui-text-secondary);
+  --el-text-color-secondary: var(--ui-text-muted);
+  --el-border-color: var(--ui-border);
+  --el-border-color-light: var(--ui-border-soft);
+  --el-bg-color: var(--ui-surface);
+  --el-fill-color-light: var(--ui-bg-subtle);
+}
+
+/* ============================================================
+   基础元素
+   ============================================================ */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-family: var(--ui-font-sans);
+  font-size: var(--ui-text-md);
+  line-height: var(--ui-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--ui-brand-600);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ui-brand-700);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* ============================================================
+   可复用基础类
+   ============================================================ */
+
+.ui-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-page-gap);
+}
+
+.ui-panel {
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+}
+
+.ui-panel-pad {
+  padding: var(--ui-space-8) var(--ui-space-9);
+}
+
+.ui-title-page {
+  margin: 0;
+  font-size: var(--ui-text-2xl);
+  font-weight: var(--ui-weight-bold);
+  letter-spacing: -0.3px;
+  color: var(--ui-text);
+}
+
+.ui-title-card {
+  font-size: var(--ui-text-lg);
+  font-weight: var(--ui-weight-bold);
+  color: var(--ui-text);
+}
+
+.ui-subtitle {
+  margin-top: var(--ui-space-1);
+  font-size: var(--ui-text-sm);
+  color: var(--ui-text-subtle);
+}
+
+.ui-muted {
+  color: var(--ui-text-muted);
+}
+
+.ui-mono {
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-text-sm);
+}
+
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-1);
+  padding: 2px 9px;
+  border-radius: var(--ui-radius-pill);
+  font-size: var(--ui-text-sm);
+  line-height: 20px;
+  color: var(--ui-brand-600);
+  background: var(--ui-brand-100);
+}
+
+.ui-elevate {
+  box-shadow: var(--ui-shadow-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

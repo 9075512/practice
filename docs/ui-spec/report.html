@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>练题云 UI 设计系统 · 可视化报告</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="components.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--ui-bg);
+        color: var(--ui-text);
+        font-family: var(--ui-font-sans);
+        font-size: 14px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      a {
+        color: var(--ui-primary);
+        text-decoration: none;
+      }
+
+      code {
+        font-family: var(--ui-font-mono);
+        font-size: 12px;
+      }
+
+      /* ---------- 布局 ---------- */
+      .layout {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .side {
+        position: sticky;
+        top: 0;
+        width: 232px;
+        height: 100vh;
+        flex: none;
+        padding: 20px 14px 32px;
+        background: var(--ui-surface);
+        border-right: 1px solid var(--ui-border);
+        overflow-y: auto;
+      }
+
+      .main {
+        flex: 1;
+        min-width: 0;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 26px 30px 80px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 6px 18px;
+      }
+
+      .brand-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        flex: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        box-shadow: 0 5px 12px rgba(37, 99, 235, 0.28);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .brand-name {
+        font-size: 14px;
+        font-weight: 650;
+        letter-spacing: -0.2px;
+      }
+
+      .brand-sub {
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--ui-text-subtle);
+      }
+
+      .nav-group-label {
+        padding: 14px 10px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--ui-text-subtle);
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+
+      .nav a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--ui-text-secondary);
+        transition: all 0.16s var(--ui-ease);
+      }
+
+      .nav a:hover {
+        background: var(--ui-bg-subtle);
+        color: var(--ui-text);
+      }
+
+      .nav a.active {
+        background: var(--ui-brand-100);
+        color: var(--ui-primary);
+        font-weight: 600;
+      }
+
+      .nav a .num {
+        font-family: var(--ui-font-mono);
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+      }
+
+      .side-foot {
+        margin-top: 18px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--ui-bg-subtle);
+        font-size: 11px;
+        line-height: 1.7;
+        color: var(--ui-text-muted);
+      }
+
+      /* ---------- 封面 ---------- */
+      .cover {
+        position: relative;
+        padding: 42px 44px 36px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #081226 0%, #10254a 46%, #1d4ed8 135%);
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .cover::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(circle at 78% 18%, #000 0%, transparent 62%);
+        -webkit-mask-image: radial-gradient(circle at 78% 18%, #000 0%, transparent 62%);
+      }
+
+      .cover::after {
+        content: '';
+        position: absolute;
+        top: -120px;
+        right: -90px;
+        width: 380px;
+        height: 380px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(96, 165, 250, 0.42), transparent 66%);
+        pointer-events: none;
+      }
+
+      .cover > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .cover-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        font-size: 10px;
+        letter-spacing: 1.4px;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .cover-tag i {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+      }
+
+      .cover h1 {
+        margin: 18px 0 14px;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -1.3px;
+      }
+
+      .cover h1 span {
+        color: #93c5fd;
+      }
+
+      .cover p {
+        max-width: 64ch;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.95;
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      .cover-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 28px;
+      }
+
+      .cm {
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(4px);
+      }
+
+      .cm b {
+        display: block;
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+      }
+
+      .cm b em {
+        margin-left: 2px;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .cm span {
+        display: block;
+        margin-top: 3px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.58);
+      }
+
+      .cover-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 26px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      /* ---------- 章节 ---------- */
+      .section {
+        margin-top: 30px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .section-num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex: none;
+        border-radius: 9px;
+        background: var(--ui-brand-100);
+        color: var(--ui-primary);
+        font-family: var(--ui-font-mono);
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: var(--ui-weight-bold);
+        letter-spacing: -0.3px;
+      }
+
+      .section-desc {
+        margin: 3px 0 0;
+        font-size: 12px;
+        line-height: 1.75;
+        color: var(--ui-text-subtle);
+      }
+
+      .card {
+        padding: 18px 20px;
+        border: 1px solid var(--ui-border);
+        border-radius: var(--ui-radius-lg);
+        background: var(--ui-surface);
+        box-shadow: var(--ui-shadow-card);
+      }
+
+      .card + .card {
+        margin-top: 12px;
+      }
+
+      .card-title {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .card-desc {
+        margin: 0 0 14px;
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+      }
+
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      /* ---------- 图表通用 ---------- */
+      .chart-note {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+      }
+
+      .hbar {
+        display: grid;
+        grid-template-columns: 128px 1fr 44px;
+        gap: 10px;
+        align-items: center;
+        padding: 4px 0;
+        font-size: 12px;
+      }
+
+      .hbar-name {
+        color: var(--ui-text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .hbar-track {
+        height: 8px;
+        border-radius: 99px;
+        background: var(--ui-divider);
+        overflow: hidden;
+      }
+
+      .hbar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #93b4fa, #2563eb);
+      }
+
+      .hbar-fill.alt {
+        background: linear-gradient(90deg, #c4b5fd, #7c3aed);
+      }
+
+      .hbar-fill.cyan {
+        background: linear-gradient(90deg, #a5f3fc, #0891b2);
+      }
+
+      .hbar-val {
+        font-family: var(--ui-font-mono);
+        font-size: 11px;
+        text-align: right;
+        color: var(--ui-text-muted);
+      }
+
+      .donut-wrap {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        flex-wrap: wrap;
+      }
+
+      .donut {
+        position: relative;
+        width: 148px;
+        height: 148px;
+        flex: none;
+        border-radius: 50%;
+        background: conic-gradient(
+          #2563eb 0 36%,
+          #7c3aed 36% 64%,
+          #0891b2 64% 84%,
+          #f59e0b 84% 100%
+        );
+      }
+
+      .donut::after {
+        content: '';
+        position: absolute;
+        inset: 24px;
+        border-radius: 50%;
+        background: var(--ui-surface);
+      }
+
+      .donut-center {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .donut-center b {
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.5px;
+      }
+
+      .donut-center span {
+        margin-top: 3px;
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+      }
+
+      .legend {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        font-size: 12px;
+        color: var(--ui-text-secondary);
+      }
+
+      .legend i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 7px;
+        border-radius: 2px;
+        vertical-align: 1px;
+      }
+
+      .legend b {
+        margin-left: 6px;
+        font-family: var(--ui-font-mono);
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+        font-weight: 400;
+      }
+
+      /* ---------- 指标矩阵 ---------- */
+      .matrix {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .matrix th {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--ui-border);
+        background: var(--ui-table-head);
+        color: var(--ui-text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .matrix th:first-child {
+        text-align: left;
+      }
+
+      .matrix td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--ui-divider);
+        text-align: center;
+        color: var(--ui-text-muted);
+      }
+
+      .matrix td:first-child {
+        text-align: left;
+        color: var(--ui-text-secondary);
+        white-space: nowrap;
+      }
+
+      .matrix tr:hover td {
+        background: var(--ui-surface-hover);
+      }
+
+      .dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--ui-border);
+      }
+
+      .dot.on {
+        background: var(--ui-success);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+      }
+
+      .dot.partial {
+        background: var(--ui-warning);
+      }
+
+      .dot.none {
+        background: #e2e8f0;
+      }
+
+      .matrix-legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+      }
+
+      /* ---------- 对比度 ---------- */
+      .contrast-row {
+        display: grid;
+        grid-template-columns: 178px 1fr 76px;
+        gap: 10px;
+        align-items: center;
+        padding: 5px 0;
+        font-size: 11px;
+      }
+
+      .contrast-swatch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .contrast-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 22px;
+        border: 1px solid var(--ui-border);
+        border-radius: 5px;
+        font-size: 10px;
+        flex: none;
+      }
+
+      .contrast-label {
+        color: var(--ui-text-muted);
+        font-family: var(--ui-font-mono);
+        font-size: 10px;
+      }
+
+      .contrast-track {
+        position: relative;
+        height: 10px;
+        border-radius: 99px;
+        background: var(--ui-divider);
+      }
+
+      .contrast-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: var(--ui-success);
+      }
+
+      .contrast-fill.warn {
+        background: var(--ui-warning);
+      }
+
+      .contrast-fill.fail {
+        background: var(--ui-danger);
+      }
+
+      .contrast-threshold {
+        position: absolute;
+        top: -4px;
+        bottom: -4px;
+        width: 1px;
+        background: #94a3b8;
+        opacity: 0.7;
+      }
+
+      .contrast-threshold span {
+        position: absolute;
+        top: -14px;
+        left: 3px;
+        font-size: 9px;
+        color: var(--ui-text-subtle);
+        white-space: nowrap;
+      }
+
+      .contrast-score {
+        font-family: var(--ui-font-mono);
+        font-size: 11px;
+        text-align: right;
+      }
+
+      .contrast-score.pass {
+        color: var(--ui-success-text);
+      }
+
+      .contrast-score.warn {
+        color: var(--ui-warning-text);
+      }
+
+      .contrast-score.fail {
+        color: var(--ui-danger-text);
+      }
+
+      /* ---------- 字阶与间距 ---------- */
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--ui-divider);
+      }
+
+      .type-row:last-child {
+        border-bottom: 0;
+      }
+
+      .type-meta {
+        width: 92px;
+        flex: none;
+        font-family: var(--ui-font-mono);
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+        line-height: 1.7;
+      }
+
+      .type-sample {
+        flex: 1;
+        min-width: 0;
+        color: var(--ui-text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .space-row {
+        display: grid;
+        grid-template-columns: 74px 1fr 52px;
+        gap: 10px;
+        align-items: center;
+        padding: 3px 0;
+        font-size: 11px;
+        color: var(--ui-text-muted);
+      }
+
+      .space-bar {
+        height: 10px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #93b4fa, #2563eb);
+      }
+
+      .space-val {
+        font-family: var(--ui-font-mono);
+        font-size: 10px;
+        text-align: right;
+        color: var(--ui-text-subtle);
+      }
+
+      .radius-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+
+      .radius-item {
+        text-align: center;
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+      }
+
+      .radius-box {
+        height: 62px;
+        margin-bottom: 6px;
+        border: 1px solid var(--ui-brand-200);
+        background: var(--ui-brand-50);
+      }
+
+      .shadow-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .shadow-box {
+        height: 64px;
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      /* ---------- 组件画廊 ---------- */
+      .gallery {
+        display: grid;
+        gap: 12px;
+      }
+
+      .g-block {
+        padding: 14px 16px;
+        border: 1px solid var(--ui-border-soft);
+        border-radius: var(--ui-radius-md);
+        background: #fbfcff;
+      }
+
+      .g-label {
+        margin-bottom: 10px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        color: var(--ui-text-subtle);
+      }
+
+      .g-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .g-row + .g-row {
+        margin-top: 12px;
+      }
+
+      .g-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .g-cap {
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+      }
+
+      .sim-hover.ui-btn--primary {
+        background: var(--ui-primary-hover);
+      }
+
+      .sim-active.ui-btn--primary {
+        background: var(--ui-primary-active);
+      }
+
+      .sim-focus.ui-btn {
+        outline: 2px solid var(--ui-brand-400);
+        outline-offset: 2px;
+      }
+
+      .sim-hover.ui-btn--default {
+        border-color: var(--ui-brand-300);
+        color: var(--ui-primary);
+      }
+
+      .sim-focus.ui-input {
+        border-color: var(--ui-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        outline: none;
+      }
+
+      .drawer-stage {
+        position: relative;
+        height: 270px;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #eef2f7;
+      }
+
+      .drawer-stage .ui-mask {
+        position: absolute;
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .drawer-stage .ui-drawer {
+        position: absolute;
+        width: 300px;
+        transform: none;
+        box-shadow: -12px 0 32px rgba(15, 23, 42, 0.14);
+      }
+
+      .drawer-stage .ui-drawer__body {
+        padding: 14px 18px;
+      }
+
+      .modal-stage {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.42);
+      }
+
+      .modal-stage .ui-modal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+      }
+
+      /* ---------- 响应式示意 ---------- */
+      .frame-row {
+        display: grid;
+        grid-template-columns: 1.35fr 0.65fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .frame {
+        padding: 8px;
+        border: 1px solid var(--ui-border);
+        border-radius: 12px;
+        background: var(--ui-bg);
+      }
+
+      .frame-label {
+        margin-bottom: 8px;
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+        text-align: center;
+      }
+
+      .mock {
+        overflow: hidden;
+        border-radius: 8px;
+        background: var(--ui-bg);
+      }
+
+      .mock-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 9px;
+        background: #fff;
+        border-bottom: 1px solid var(--ui-border);
+      }
+
+      .mock-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #cbd5e1;
+      }
+
+      .mock-body {
+        display: flex;
+        min-height: 160px;
+      }
+
+      .mock-side {
+        width: 74px;
+        padding: 8px 6px;
+        background: #fff;
+        border-right: 1px solid var(--ui-border);
+      }
+
+      .mock-line {
+        height: 5px;
+        margin-bottom: 6px;
+        border-radius: 3px;
+        background: var(--ui-divider);
+      }
+
+      .mock-line.blue {
+        background: var(--ui-brand-200);
+      }
+
+      .mock-content {
+        flex: 1;
+        padding: 8px;
+      }
+
+      .mock-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        margin-bottom: 6px;
+      }
+
+      .mock-kpi {
+        height: 26px;
+        border-radius: 5px;
+        background: #fff;
+        border: 1px solid var(--ui-border-soft);
+      }
+
+      .mock-chart {
+        height: 54px;
+        border-radius: 6px;
+        background: #fff;
+        border: 1px solid var(--ui-border-soft);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mock-chart::after {
+        content: '';
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        bottom: 12px;
+        height: 26px;
+        background: linear-gradient(180deg, rgba(37, 99, 235, 0.22), rgba(37, 99, 235, 0.04));
+        border-top: 2px solid #2563eb;
+        border-radius: 2px;
+        clip-path: polygon(0 70%, 16% 42%, 32% 58%, 50% 20%, 68% 44%, 84% 10%, 100% 30%, 100% 100%, 0 100%);
+      }
+
+      .mock-table {
+        margin-top: 6px;
+        height: 34px;
+        border-radius: 6px;
+        background: #fff;
+        border: 1px solid var(--ui-border-soft);
+      }
+
+      .mock.mobile .mock-side {
+        display: none;
+      }
+
+      .mock.mobile .mock-kpis {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .mock.mobile .mock-content {
+        padding: 7px;
+      }
+
+      .mock.mobile .mock-chart {
+        height: 46px;
+      }
+
+      /* ---------- 清单 ---------- */
+      .check {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12px;
+        line-height: 1.9;
+        color: var(--ui-text-secondary);
+      }
+
+      .check li {
+        display: flex;
+        gap: 8px;
+        padding: 4px 0;
+        border-bottom: 1px dashed var(--ui-divider);
+      }
+
+      .check li:last-child {
+        border-bottom: 0;
+      }
+
+      .check i {
+        flex: none;
+        width: 14px;
+        height: 14px;
+        margin-top: 4px;
+        border-radius: 4px;
+        background: var(--ui-success-soft);
+        border: 1px solid var(--ui-success-border);
+        position: relative;
+      }
+
+      .check i::after {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: 1px;
+        width: 5px;
+        height: 8px;
+        border-right: 1.5px solid var(--ui-success-text);
+        border-bottom: 1.5px solid var(--ui-success-text);
+        transform: rotate(40deg);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .table th {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--ui-border);
+        background: var(--ui-table-head);
+        color: var(--ui-text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--ui-divider);
+        color: var(--ui-text-secondary);
+        vertical-align: top;
+      }
+
+      .table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .table code {
+        color: var(--ui-primary);
+        font-size: 11px;
+      }
+
+      .tag-mini {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        line-height: 16px;
+      }
+
+      .tag-mini.ok {
+        background: var(--ui-success-soft);
+        color: var(--ui-success-text);
+        border: 1px solid var(--ui-success-border);
+      }
+
+      .tag-mini.warn {
+        background: var(--ui-warning-soft);
+        color: var(--ui-warning-text);
+        border: 1px solid var(--ui-warning-border);
+      }
+
+      .tag-mini.fail {
+        background: var(--ui-danger-soft);
+        color: var(--ui-danger-text);
+        border: 1px solid var(--ui-danger-border);
+      }
+
+      .scroll-hint {
+        display: none;
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--ui-text-subtle);
+      }
+
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+        padding-top: 16px;
+        border-top: 1px solid var(--ui-border);
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+      }
+
+      /* ---------- 响应式 ---------- */
+      @media screen and (max-width: 1024px) {
+        .layout {
+          display: block;
+        }
+
+        .side {
+          position: static;
+          width: auto;
+          height: auto;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          border-right: 0;
+          border-bottom: 1px solid var(--ui-border);
+          overflow-x: auto;
+        }
+
+        .side .brand,
+        .side .nav-group-label,
+        .side-foot {
+          display: none;
+        }
+
+        .nav {
+          flex-direction: row;
+          gap: 6px;
+        }
+
+        .nav a {
+          padding: 6px 10px;
+          background: var(--ui-bg-subtle);
+          border-radius: var(--ui-radius-pill);
+          white-space: nowrap;
+        }
+
+        .nav a .num {
+          display: none;
+        }
+
+        .main {
+          padding: 16px 14px 60px;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .cover {
+          padding: 26px 20px 22px;
+          border-radius: 14px;
+        }
+
+        .cover h1 {
+          font-size: 27px;
+          letter-spacing: -0.8px;
+        }
+
+        .cover-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .cm b {
+          font-size: 22px;
+        }
+
+        .grid2,
+        .grid3 {
+          grid-template-columns: 1fr;
+        }
+
+        .frame-row {
+          grid-template-columns: 1fr;
+        }
+
+        .radius-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .shadow-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hbar {
+          grid-template-columns: 96px 1fr 38px;
+        }
+
+        .contrast-row {
+          grid-template-columns: 130px 1fr 62px;
+        }
+
+        .contrast-chip {
+          width: 34px;
+        }
+
+        .scroll-hint {
+          display: block;
+        }
+      }
+
+      /* ---------- 打印 ---------- */
+      @page {
+        size: A4;
+        margin: 11mm 10mm;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          font-size: 10.5px;
+        }
+
+        .layout {
+          display: block;
+        }
+
+        .side {
+          display: none;
+        }
+
+        .main {
+          max-width: none;
+          padding: 0;
+        }
+
+        .cover {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 258mm;
+          padding: 30px 28px 24px;
+          border-radius: 12px;
+          break-after: page;
+        }
+
+        .cover h1 {
+          font-size: 32px;
+        }
+
+        .section {
+          margin-top: 14px;
+        }
+
+        .section-head {
+          break-after: avoid;
+        }
+
+        .card {
+          padding: 12px 14px;
+          box-shadow: none;
+          break-inside: avoid;
+        }
+
+        .swatches,
+        .donut-wrap,
+        .type-row > *,
+        .hbar,
+        .space-row,
+        .radius-grid,
+        .shadow-grid,
+        .g-block,
+        .contrast-row,
+        .frame-row,
+        .matrix-legend {
+          break-inside: avoid;
+        }
+
+        .grid2,
+        .grid3,
+        .frame-row,
+        .g-block,
+        .donut-wrap,
+        .contrast-row,
+        .chart-note,
+        .matrix-legend {
+          break-inside: avoid;
+        }
+
+        .section h2 {
+          font-size: 16px;
+        }
+
+        .table,
+        .matrix {
+          font-size: 9.5px;
+          break-inside: avoid;
+        }
+
+        .table th,
+        .table td,
+        .matrix th,
+        .matrix td {
+          padding: 6px 8px;
+        }
+
+        .card-split {
+          break-inside: auto;
+        }
+
+        .card-split .table {
+          break-inside: auto;
+        }
+
+        .card-split table {
+          min-width: 0 !important;
+          table-layout: fixed;
+          font-size: 9px;
+        }
+
+        .card-split th:nth-child(1) {
+          width: 52px !important;
+        }
+
+        .card-split th:nth-child(2) {
+          width: 70px !important;
+        }
+
+        .card-split th:nth-child(3) {
+          width: 118px !important;
+        }
+
+        .card-split th:nth-child(4) {
+          width: auto !important;
+        }
+
+        .card-split th:nth-child(5) {
+          width: 66px !important;
+        }
+
+        .card-split th:nth-child(6) {
+          width: 112px !important;
+        }
+
+        .card-split td {
+          overflow-wrap: anywhere;
+        }
+
+        .swatches > div > div:first-child {
+          height: 34px !important;
+        }
+
+        .type-row {
+          padding: 5px 0;
+        }
+
+        .radius-box {
+          height: 48px;
+        }
+
+        .card + .card {
+          margin-top: 10px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="layout">
+      <aside class="side">
+        <div class="brand">
+          <div class="brand-mark">报</div>
+          <div>
+            <div class="brand-name">设计系统报告</div>
+            <div class="brand-sub">DESIGN SYSTEM · V1.0</div>
+          </div>
+        </div>
+
+        <div class="nav-group-label">报告</div>
+        <nav class="nav">
+          <a href="#overview">摘要与概览 <span class="num">01</span></a>
+          <a href="#tokens">设计令牌 <span class="num">02</span></a>
+          <a href="#components">组件覆盖 <span class="num">03</span></a>
+          <a href="#gallery">组件视图 <span class="num">04</span></a>
+          <a href="#responsive">响应式 <span class="num">05</span></a>
+          <a href="#a11y">可访问性 <span class="num">06</span></a>
+          <a href="#adoption">落地清单 <span class="num">07</span></a>
+        </nav>
+
+        <div class="side-foot">
+          <b>数据来源</b><br />
+          练题云后台真实代码与线上页面，令牌 128 项、组件 25 个，数值均可回溯到 <code>tokens.css</code> / <code>components.css</code>。
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="cover">
+          <div class="cover-tag"><i></i>UI DESIGN SYSTEM REPORT · 2026</div>
+          <h1>练题云界面设计系统<br /><span>可视化报告</span></h1>
+          <p>
+            从练题系统后台沉淀的一套浅色中后台视觉体系。本报告用可视化方式呈现设计令牌、组件覆盖、响应式策略与可访问性现状，
+            并给出可直接执行的落地清单。所有组件与色值均由真实样式文件渲染，可在其他项目原样复用。
+          </p>
+          <div class="cover-metrics">
+            <div class="cm"><b>128<em>项</em></b><span>设计令牌</span></div>
+            <div class="cm"><b>25<em>个</em></b><span>组件</span></div>
+            <div class="cm"><b>4<em>档</em></b><span>响应式断点</span></div>
+            <div class="cm"><b>100<em>%</em></b><span>状态覆盖</span></div>
+          </div>
+          <div class="cover-foot">
+            <span>基于 Vue 3 + Element Plus 后台与原生小程序实践</span>
+            <span>版本 v1.0 · 2026-10-18</span>
+          </div>
+        </header>
+
+        <section class="section" id="overview">
+          <div class="section-head">
+            <div class="section-num">01</div>
+            <div>
+              <h2>摘要与概览</h2>
+              <p class="section-desc">先看结论：这套体系解决什么问题、由什么构成、目前完成到什么程度。</p>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <h3 class="card-title">四条设计结论</h3>
+              <p class="card-desc">决定这套界面取舍的核心判断</p>
+              <ul class="check">
+                <li><i></i><span><b>信息优先</b>：先回答「现在怎么样」，再提供操作；用字号与字重建层级，不靠大面积色块。</span></li>
+                <li><i></i><span><b>层级克制</b>：一屏一个主按钮、一层阴影、一套圆角，颜色只用于状态与主操作。</span></li>
+                <li><i></i><span><b>双端同源</b>：不为手机复制第二套页面，靠断点收敛列、宽度与间距。</span></li>
+                <li><i></i><span><b>令牌先行</b>：颜色、间距、圆角、阴影全部变量化，业务代码不写死 hex。</span></li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">组件构成</h3>
+              <p class="card-desc">25 个组件按职责分为四组</p>
+              <div class="donut-wrap">
+                <div class="donut">
+                  <div class="donut-center"><b>25</b><span>组件</span></div>
+                </div>
+                <div class="legend">
+                  <span><i style="background: #2563eb"></i>基础控件<b>9</b></span>
+                  <span><i style="background: #7c3aed"></i>数据展示<b>7</b></span>
+                  <span><i style="background: #0891b2"></i>状态反馈<b>5</b></span>
+                  <span><i style="background: #f59e0b"></i>浮层导航<b>4</b></span>
+                </div>
+              </div>
+              <div class="chart-note">基础控件占比最高（36%），说明这套体系以表单与列表录入为主。</div>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top: 12px">
+            <div class="card">
+              <h3 class="card-title">令牌构成</h3>
+              <p class="card-desc">128 项变量中，间距与文字类占比最高</p>
+              <div class="hbar">
+                <span class="hbar-name">间距 space</span>
+                <div class="hbar-track"><div class="hbar-fill" style="width: 100%"></div></div>
+                <span class="hbar-val">14</span>
+              </div>
+              <div class="hbar">
+                <span class="hbar-name">文字 text</span>
+                <div class="hbar-track"><div class="hbar-fill" style="width: 93%"></div></div>
+                <span class="hbar-val">13</span>
+              </div>
+              <div class="hbar">
+                <span class="hbar-name">品牌 brand</span>
+                <div class="hbar-track"><div class="hbar-fill" style="width: 64%"></div></div>
+                <span class="hbar-val">9</span>
+              </div>
+              <div class="hbar">
+                <span class="hbar-name">图表 chart</span>
+                <div class="hbar-track"><div class="hbar-fill cyan" style="width: 57%"></div></div>
+                <span class="hbar-val">8</span>
+              </div>
+              <div class="hbar">
+                <span class="hbar-name">圆角 radius</span>
+                <div class="hbar-track"><div class="hbar-fill alt" style="width: 50%"></div></div>
+                <span class="hbar-val">7</span>
+              </div>
+              <div class="hbar">
+                <span class="hbar-name">阴影 shadow</span>
+                <div class="hbar-track"><div class="hbar-fill alt" style="width: 36%"></div></div>
+                <span class="hbar-val">5</span>
+              </div>
+              <div class="chart-note">完整分布见第 02 节；语义色（成功/警告/危险/信息）共 18 项，占 14%。</div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">完成度</h3>
+              <p class="card-desc">设计系统五项交付物的当前状态</p>
+              <table class="table">
+                <thead>
+                  <tr><th>交付物</th><th>状态</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>设计令牌</td><td><span class="tag-mini ok">完成</span></td><td>128 项，含 Element Plus 映射</td></tr>
+                  <tr><td>组件样式</td><td><span class="tag-mini ok">完成</span></td><td>25 个组件，5 类状态</td></tr>
+                  <tr><td>可视化规范</td><td><span class="tag-mini ok">完成</span></td><td>规范页 + 本报告</td></tr>
+                  <tr><td>文案与交互</td><td><span class="tag-mini warn">部分</span></td><td>组件级规则已覆盖，页面级话术待补</td></tr>
+                  <tr><td>暗色主题</td><td><span class="tag-mini fail">未开始</span></td><td>令牌已预留语义层，可直接扩展</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <div class="section-head">
+            <div class="section-num">02</div>
+            <div>
+              <h2>设计令牌</h2>
+              <p class="section-desc">颜色、字体、间距、圆角、阴影与动效共 128 项变量，全部以 <code>--ui-</code> 为前缀，业务样式只引用变量。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">2.1 色彩系统</h3>
+            <p class="card-desc">主色承担品牌与主操作，中性色承担约 90% 的界面，语义色只表达状态。</p>
+
+            <div class="swatches" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px">
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #f5f9ff; border: 1px solid #e5e9f2"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#F5F9FF</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-50</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #eff6ff; border: 1px solid #e5e9f2"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#EFF6FF</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-100 选中底</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #c7d9fd"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#C7D9FD</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-200 禁用</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #93b4fa"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#93B4FA</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-300 聚焦环</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #5b8bf5"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#5B8BF5</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-400 hover</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #2563eb"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#2563EB</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-600 主色</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #1d4ed8"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#1D4ED8</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">brand-700 active</div>
+              </div>
+              <div>
+                <div style="height: 48px; border-radius: 8px; background: #0f172a"></div>
+                <div style="margin-top: 5px; font-family: var(--ui-font-mono); font-size: 10px; color: var(--ui-text)">#0F172A</div>
+                <div style="font-size: 10px; color: var(--ui-text-subtle)">text 主文字</div>
+              </div>
+            </div>
+
+            <div class="swatches" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; margin-top: 14px">
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #10b981"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">成功 #10B981</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #f59e0b"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">警告 #F59E0B</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #ef4444"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">危险 #EF4444</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #0891b2"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">信息 #0891B2</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #7c3aed"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">紫 #7C3AED</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #ea580c"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">橙 #EA580C</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #64748b"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">辅助 #64748B</div>
+              </div>
+              <div>
+                <div style="height: 34px; border-radius: 8px; background: #f4f6fb; border: 1px solid #e5e9f2"></div>
+                <div style="margin-top: 5px; font-size: 10px; color: var(--ui-text-muted)">底色 #F4F6FB</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px">
+              <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--ui-text-subtle); margin-bottom: 5px">
+                <span>色彩使用配比（经验值）</span><span>中性 90% · 品牌 7% · 语义 3%</span>
+              </div>
+              <div style="display: flex; height: 12px; border-radius: 99px; overflow: hidden">
+                <div style="width: 90%; background: #e2e8f0"></div>
+                <div style="width: 7%; background: #2563eb"></div>
+                <div style="width: 3%; background: #10b981"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">2.2 字阶</h3>
+            <p class="card-desc">基准 14px；正文 13–14，辅助 12，微文案 11；标题层级靠字号与字重同时建立。</p>
+            <div class="type-row">
+              <div class="type-meta">40 / 700<br />展示数字</div>
+              <div class="type-sample" style="font-size: 40px; font-weight: 700; letter-spacing: -1px">142</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">22 / 650<br />页面标题</div>
+              <div class="type-sample" style="font-size: 22px; font-weight: 650; letter-spacing: -0.3px">题目管理</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">20 / 650<br />区块标题</div>
+              <div class="type-sample" style="font-size: 20px; font-weight: 650">数据看板</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">15 / 650<br />卡片标题</div>
+              <div class="type-sample" style="font-size: 15px; font-weight: 650">练习趋势</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">14 / 400<br />正文基准</div>
+              <div class="type-sample" style="font-size: 14px">教师资格 · 综合素质，共 48 道题。</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">13 / 400<br />控件与表格</div>
+              <div class="type-sample" style="font-size: 13px">提交后逐题判分，并写入错题本与日统计。</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">12 / 400<br />辅助说明</div>
+              <div class="type-sample" style="font-size: 12px; color: var(--ui-text-muted)">最多 40 个字符，保存后可在小程序端看到</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">11 / 500<br />微文案</div>
+              <div class="type-sample" style="font-size: 11px; color: var(--ui-text-subtle)">近 14 天 · 按日聚合</div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <h3 class="card-title">2.3 间距刻度</h3>
+              <p class="card-desc">以 4px 为基础，14px 为卡片间距</p>
+              <div class="space-row"><span>space-1</span><div class="space-bar" style="width: 4px"></div><span class="space-val">4</span></div>
+              <div class="space-row"><span>space-3</span><div class="space-bar" style="width: 8px"></div><span class="space-val">8</span></div>
+              <div class="space-row"><span>space-5</span><div class="space-bar" style="width: 12px"></div><span class="space-val">12</span></div>
+              <div class="space-row"><span>space-6</span><div class="space-bar" style="width: 14px"></div><span class="space-val">14</span></div>
+              <div class="space-row"><span>space-7</span><div class="space-bar" style="width: 16px"></div><span class="space-val">16</span></div>
+              <div class="space-row"><span>space-9</span><div class="space-bar" style="width: 20px"></div><span class="space-val">20</span></div>
+              <div class="space-row"><span>space-10</span><div class="space-bar" style="width: 24px"></div><span class="space-val">24</span></div>
+              <div class="space-row"><span>space-11</span><div class="space-bar" style="width: 28px"></div><span class="space-val">28</span></div>
+              <div class="space-row"><span>space-13</span><div class="space-bar" style="width: 40px"></div><span class="space-val">40</span></div>
+              <div class="chart-note">条长为等比示意；页面区块间距 18，卡片间距 14，内容区内边距桌面 28 / 手机 12。</div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">2.4 圆角与阴影</h3>
+              <p class="card-desc">只保留三档圆角与两类常用阴影</p>
+              <div class="radius-grid">
+                <div class="radius-item"><div class="radius-box" style="border-radius: 6px"></div>6 标签</div>
+                <div class="radius-item"><div class="radius-box" style="border-radius: 8px"></div>8 控件</div>
+                <div class="radius-item"><div class="radius-box" style="border-radius: 10px"></div>10 卡片头</div>
+                <div class="radius-item"><div class="radius-box" style="border-radius: 14px"></div>14 面板</div>
+                <div class="radius-item"><div class="radius-box" style="border-radius: 999px; height: 30px; margin-top: 16px; margin-bottom: 22px"></div>999 胶囊</div>
+              </div>
+              <div class="shadow-grid" style="margin-top: 4px">
+                <div class="shadow-box" style="box-shadow: var(--ui-shadow-card)"></div>
+                <div class="shadow-box" style="box-shadow: var(--ui-shadow-soft)"></div>
+                <div class="shadow-box" style="box-shadow: 0 6px 14px rgba(37, 99, 235, 0.26)"></div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 6px; font-size: 10px; color: var(--ui-text-subtle); text-align: center">
+                <span>card 卡片</span><span>soft 指标卡</span><span>brand 主按钮</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">2.5 动效与层级</h3>
+            <p class="card-desc">动效只用于状态变化，不做装饰性动画</p>
+            <table class="table">
+              <thead>
+                <tr><th>令牌</th><th>值</th><th>用途</th><th>约束</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>--ui-duration-fast</code></td><td>0.16s</td><td>按钮、链接、输入框状态</td><td>hover 不超过 0.2s</td></tr>
+                <tr><td><code>--ui-duration</code></td><td>0.2s</td><td>遮罩、开关、提示</td><td>与缓动搭配使用</td></tr>
+                <tr><td><code>--ui-duration-slow</code></td><td>0.25s</td><td>抽屉、图表入场</td><td>页面切换不超过 0.3s</td></tr>
+                <tr><td><code>--ui-ease</code></td><td>cubic-bezier(.4,0,.2,1)</td><td>通用过渡</td><td>统一缓动，不逐组件自定</td></tr>
+                <tr><td><code>--ui-z-mask / drawer / toast</code></td><td>90 / 100 / 1000</td><td>层级管理</td><td>禁止业务代码写 z-index 数字</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="components">
+          <div class="section-head">
+            <div class="section-num">03</div>
+            <div>
+              <h2>组件覆盖</h2>
+              <p class="section-desc">25 个组件按职责分四组；覆盖矩阵用于判断「哪些状态已经定义、哪些还需要补」。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">3.1 状态覆盖矩阵</h3>
+            <p class="card-desc">绿色=已实现，黄色=部分实现或需业务补充，灰色=该组件不适用</p>
+            <div style="overflow-x: auto">
+              <table class="matrix" style="min-width: 640px">
+                <thead>
+                  <tr>
+                    <th>组件</th>
+                    <th>默认</th>
+                    <th>Hover</th>
+                    <th>Focus</th>
+                    <th>选中</th>
+                    <th>禁用</th>
+                    <th>加载</th>
+                    <th>错误 / 空</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>按钮</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>输入框</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td></tr>
+                  <tr><td>下拉选择</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td></tr>
+                  <tr><td>复选 / 单选</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>开关</td><td><i class="dot on"></i></td><td><i class="dot partial"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>标签</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>状态胶囊</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>卡片</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot partial"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>指标卡</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot partial"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>表格</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot partial"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td></tr>
+                  <tr><td>分页</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot partial"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>空态</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td></tr>
+                  <tr><td>抽屉 / 弹窗</td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot on"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td><td><i class="dot partial"></i></td><td><i class="dot none"></i></td></tr>
+                  <tr><td>标签页 / 分段</td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot on"></i></td><td><i class="dot partial"></i></td><td><i class="dot none"></i></td><td><i class="dot none"></i></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scroll-hint">左右滑动查看全部状态列</div>
+            <div class="matrix-legend">
+              <span><i class="dot on" style="margin-right: 4px"></i>已实现</span>
+              <span><i class="dot partial" style="margin-right: 4px"></i>部分实现 / 需业务补充</span>
+              <span><i class="dot none" style="margin-right: 4px"></i>不适用</span>
+            </div>
+            <div class="chart-note">
+              结论：基础控件状态最完整；表格的「选中态」与开关的「hover」需在业务层补齐；卡片与指标卡没有错误态，加载用骨架屏承接。
+            </div>
+          </div>
+
+          <div class="card card-split">
+            <h3 class="card-title">3.2 组件清单</h3>
+            <p class="card-desc">类名即 API；尺寸与状态列为该组件需要覆盖的最小集合</p>
+            <div style="overflow-x: auto">
+              <table class="table" style="min-width: 720px">
+                <thead>
+                  <tr>
+                    <th style="width: 96px">分组</th>
+                    <th style="width: 110px">组件</th>
+                    <th style="width: 190px">类名</th>
+                    <th>主要变体</th>
+                    <th style="width: 130px">尺寸</th>
+                    <th style="width: 150px">状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td rowspan="9">基础控件</td><td>按钮</td><td><code>.ui-btn</code></td><td>primary / default / danger / text / ghost</td><td>30 / 36 / 44</td><td>hover / active / disabled / loading</td></tr>
+                  <tr><td>输入框</td><td><code>.ui-input</code></td><td>基础 / 搜索</td><td>36 / 30</td><td>hover / focus / error / disabled</td></tr>
+                  <tr><td>文本域</td><td><code>.ui-textarea</code></td><td>自适应高度</td><td>最小 88</td><td>focus / error / disabled</td></tr>
+                  <tr><td>下拉</td><td><code>.ui-select</code></td><td>原生 / 自定义</td><td>36 / 30</td><td>focus / disabled</td></tr>
+                  <tr><td>字段容器</td><td><code>.ui-field</code></td><td>label / hint / error</td><td>—</td><td>is-error</td></tr>
+                  <tr><td>复选 / 单选</td><td><code>.ui-choice</code></td><td>--radio</td><td>16 控件</td><td>checked / focus / disabled</td></tr>
+                  <tr><td>开关</td><td><code>.ui-switch</code></td><td>—</td><td>36 × 20</td><td>on / off / disabled</td></tr>
+                  <tr><td>标签</td><td><code>.ui-tag</code></td><td>题型 4 色 / 难度 3 色 / 语义 6 色</td><td>默认 / sm</td><td>静态</td></tr>
+                  <tr><td>状态胶囊</td><td><code>.ui-chip</code></td><td>success / warning / danger / info / brand</td><td>—</td><td>静态</td></tr>
+
+                  <tr><td rowspan="7">数据展示</td><td>卡片</td><td><code>.ui-card</code></td><td>head / body / foot / flush</td><td>—</td><td>—</td></tr>
+                  <tr><td>页头</td><td><code>.ui-page-head</code></td><td>标题 / 描述 / 操作</td><td>—</td><td>—</td></tr>
+                  <tr><td>指标卡</td><td><code>.ui-stat</code></td><td>默认 / brand</td><td>—</td><td>—</td></tr>
+                  <tr><td>工具栏</td><td><code>.ui-toolbar</code></td><td>left / right</td><td>—</td><td>—</td></tr>
+                  <tr><td>表格</td><td><code>.ui-table</code></td><td>compact / num / actions</td><td>—</td><td>hover / empty</td></tr>
+                  <tr><td>分页</td><td><code>.ui-pager</code></td><td>info / active</td><td>30 页码</td><td>active / disabled</td></tr>
+                  <tr><td>描述列表</td><td><code>.ui-desc</code></td><td>自适应列</td><td>—</td><td>—</td></tr>
+
+                  <tr><td rowspan="5">状态反馈</td><td>空态</td><td><code>.ui-empty</code></td><td>icon / title / desc / actions</td><td>—</td><td>—</td></tr>
+                  <tr><td>提示条</td><td><code>.ui-alert</code></td><td>info / success / warning / danger / neutral</td><td>—</td><td>—</td></tr>
+                  <tr><td>骨架屏</td><td><code>.ui-skeleton</code></td><td>title / text / block</td><td>—</td><td>动画</td></tr>
+                  <tr><td>进度条</td><td><code>.ui-progress</code></td><td>默认 / success / warning / danger</td><td>6 高</td><td>—</td></tr>
+                  <tr><td>头像</td><td><code>.ui-avatar</code></td><td>sm / md / lg</td><td>28 / 36 / 48</td><td>—</td></tr>
+
+                  <tr><td rowspan="4">浮层导航</td><td>抽屉</td><td><code>.ui-drawer</code></td><td>右侧 / --left</td><td>460 / 380 / 100%</td><td>is-open</td></tr>
+                  <tr><td>弹窗</td><td><code>.ui-modal</code></td><td>确认 / 表单</td><td>480</td><td>—</td></tr>
+                  <tr><td>标签页</td><td><code>.ui-tabs</code></td><td>下划线</td><td>—</td><td>is-active</td></tr>
+                  <tr><td>分段控件</td><td><code>.ui-segment</code></td><td>2–4 段</td><td>—</td><td>is-active</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scroll-hint">左右滑动查看完整列</div>
+            <div class="chart-note">共 25 个组件类；另有 6 个布局工具类（.ui-page / .ui-row / .ui-stack / .ui-desc 等）不计入组件统计。</div>
+          </div>
+        </section>
+
+        <section class="section" id="gallery">
+          <div class="section-head">
+            <div class="section-num">04</div>
+            <div>
+              <h2>组件视图</h2>
+              <p class="section-desc">关键组件的变体、尺寸与状态实拍。所有元素由 <code>components.css</code> 实时渲染，不是截图。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.1 按钮</h3>
+            <p class="card-desc">五种变体、三档尺寸、六种状态</p>
+            <div class="gallery">
+              <div class="g-block">
+                <div class="g-label">变体</div>
+                <div class="g-row">
+                  <div class="g-item"><button class="ui-btn ui-btn--primary">新建题库</button><span class="g-cap">primary</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--default">导入题目</button><span class="g-cap">default</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--danger">批量删除</button><span class="g-cap">danger</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--text">查看详情</button><span class="g-cap">text</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--ghost">更多</button><span class="g-cap">ghost</span></div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">尺寸</div>
+                <div class="g-row">
+                  <div class="g-item"><button class="ui-btn ui-btn--primary ui-btn--sm">小按钮</button><span class="g-cap">sm 30</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary">默认按钮</button><span class="g-cap">md 36</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary ui-btn--lg">大按钮</button><span class="g-cap">lg 44</span></div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">状态</div>
+                <div class="g-row">
+                  <div class="g-item"><button class="ui-btn ui-btn--primary">默认</button><span class="g-cap">default</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary sim-hover">悬停</button><span class="g-cap">hover</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary sim-active">按下</button><span class="g-cap">active</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary sim-focus">聚焦</button><span class="g-cap">focus</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary" disabled>禁用</button><span class="g-cap">disabled</span></div>
+                  <div class="g-item"><button class="ui-btn ui-btn--primary is-loading"><span class="ui-spinner"></span>保存中</button><span class="g-cap">loading</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.2 表单控件</h3>
+            <p class="card-desc">输入、选择、校验、开关的完整状态</p>
+            <div class="gallery">
+              <div class="g-block">
+                <div class="g-label">输入框状态</div>
+                <div class="g-row">
+                  <div class="g-item" style="width: 190px"><input class="ui-input" placeholder="默认" /><span class="g-cap">default</span></div>
+                  <div class="g-item" style="width: 190px"><input class="ui-input sim-hover" placeholder="悬停" /><span class="g-cap">hover</span></div>
+                  <div class="g-item" style="width: 190px"><input class="ui-input sim-focus" value="聚焦态" /><span class="g-cap">focus</span></div>
+                  <div class="g-item" style="width: 190px"><input class="ui-input" value="禁用" disabled /><span class="g-cap">disabled</span></div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">字段、错误与选择</div>
+                <div class="g-row">
+                  <div class="ui-field" style="width: 200px">
+                    <label class="ui-label">题库名称 <em class="ui-label__required">*</em></label>
+                    <input class="ui-input" placeholder="请输入" />
+                    <div class="ui-hint">最多 40 个字符</div>
+                  </div>
+                  <div class="ui-field is-error" style="width: 200px">
+                    <label class="ui-label">所属分类 <em class="ui-label__required">*</em></label>
+                    <select class="ui-select"><option>请选择分类</option></select>
+                    <div class="ui-error">请选择所属分类</div>
+                  </div>
+                  <div class="ui-field" style="width: 200px">
+                    <label class="ui-label">上架状态</label>
+                    <div class="ui-switch-row" style="height: 36px"><button class="ui-switch is-on" role="switch" aria-checked="true" aria-label="上架"></button>已上架</div>
+                  </div>
+                  <div class="ui-field" style="width: 200px">
+                    <label class="ui-label">正确答案</label>
+                    <div style="display: flex; gap: 14px; align-items: center; height: 36px">
+                      <label class="ui-choice ui-choice--radio"><input type="radio" name="ans" checked /><span class="ui-choice__box"></span><span class="ui-choice__label">A</span></label>
+                      <label class="ui-choice ui-choice--radio"><input type="radio" name="ans" /><span class="ui-choice__box"></span><span class="ui-choice__label">B</span></label>
+                      <label class="ui-choice"><input type="checkbox" checked /><span class="ui-choice__box"></span><span class="ui-choice__label">C</span></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.3 标签与状态</h3>
+            <p class="card-desc">题型固定四色，难度语义三色，流程状态用胶囊</p>
+            <div class="gallery">
+              <div class="g-block">
+                <div class="g-label">题型 / 难度</div>
+                <div class="g-row">
+                  <span class="ui-tag ui-tag--single">单选题</span>
+                  <span class="ui-tag ui-tag--multiple">多选题</span>
+                  <span class="ui-tag ui-tag--judge">判断题</span>
+                  <span class="ui-tag ui-tag--fill">填空题</span>
+                  <span class="ui-tag ui-tag--easy">简单</span>
+                  <span class="ui-tag ui-tag--medium">中等</span>
+                  <span class="ui-tag ui-tag--hard">困难</span>
+                  <span class="ui-tag ui-tag--neutral">未分类</span>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">流程状态</div>
+                <div class="g-row">
+                  <span class="ui-chip ui-chip--success"><i class="ui-chip__dot"></i>已提交</span>
+                  <span class="ui-chip ui-chip--warning"><i class="ui-chip__dot"></i>进行中</span>
+                  <span class="ui-chip ui-chip--danger"><i class="ui-chip__dot"></i>已中断</span>
+                  <span class="ui-chip ui-chip--info"><i class="ui-chip__dot"></i>批改中</span>
+                  <span class="ui-chip ui-chip--brand"><i class="ui-chip__dot"></i>推荐</span>
+                  <span class="ui-chip ui-chip--neutral"><i class="ui-chip__dot"></i>已下架</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.4 卡片与指标卡</h3>
+            <p class="card-desc">卡片承载内容，指标卡承载数字；数值使用等宽数字，趋势只用绿/红</p>
+            <div class="ui-stat-grid" style="margin-bottom: 12px">
+              <div class="ui-stat">
+                <div class="ui-stat__label">题目总数</div>
+                <div class="ui-stat__value">142<span class="ui-stat__unit">道</span></div>
+                <div class="ui-stat__foot"><span>覆盖 4 个题库</span><span class="ui-stat__trend ui-stat__trend--up">+12</span></div>
+              </div>
+              <div class="ui-stat">
+                <div class="ui-stat__label">平均正确率</div>
+                <div class="ui-stat__value">76.5<span class="ui-stat__unit">%</span></div>
+                <div class="ui-stat__foot"><span>较上周</span><span class="ui-stat__trend ui-stat__trend--down">-1.2%</span></div>
+              </div>
+              <div class="ui-stat ui-stat--brand">
+                <div class="ui-stat__label">练习次数</div>
+                <div class="ui-stat__value">98<span class="ui-stat__unit">次</span></div>
+                <div class="ui-stat__foot"><span>近 14 天</span><span class="ui-stat__trend" style="color: #fff">+8.4%</span></div>
+              </div>
+            </div>
+
+            <section class="ui-card">
+              <header class="ui-card__head">
+                <div>
+                  <h3 class="ui-card__title">练习趋势</h3>
+                  <div class="ui-card__subtitle">近 14 天 · 按日聚合</div>
+                </div>
+                <div class="ui-card__extra">
+                  <span class="ui-chip ui-chip--brand">按日</span>
+                  <button class="ui-btn ui-btn--text ui-btn--sm">导出</button>
+                </div>
+              </header>
+              <div class="ui-card__body">
+                <div class="ui-desc">
+                  <div><div class="ui-desc__label">练习次数</div><div class="ui-desc__value">98 次</div></div>
+                  <div><div class="ui-desc__label">平均正确率</div><div class="ui-desc__value">76.5%</div></div>
+                  <div><div class="ui-desc__label">活跃用户</div><div class="ui-desc__value">6 人</div></div>
+                  <div><div class="ui-desc__label">错题总数</div><div class="ui-desc__value">162 条</div></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.5 表格、工具栏与分页</h3>
+            <p class="card-desc">列表页的三件套：筛选在上、数据居中、分页在下</p>
+            <section class="ui-card">
+              <div class="ui-toolbar">
+                <div class="ui-toolbar__left">
+                  <div class="ui-search"><input class="ui-input" placeholder="搜索题库名称" /></div>
+                  <select class="ui-select" style="width: 130px"><option>全部分类</option></select>
+                </div>
+                <div class="ui-toolbar__right">
+                  <button class="ui-btn ui-btn--default">批量导入</button>
+                  <button class="ui-btn ui-btn--primary">新建题库</button>
+                </div>
+              </div>
+              <div class="ui-table-wrap">
+                <table class="ui-table">
+                  <thead>
+                    <tr>
+                      <th>题库</th>
+                      <th>分类</th>
+                      <th class="ui-table__num">题量</th>
+                      <th>状态</th>
+                      <th class="ui-table__actions">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="ui-table__main">
+                        <div class="ui-table__strong">教师资格 · 综合素质</div>
+                        <div class="ui-table__sub">5 个章节 · 48 道题</div>
+                      </td>
+                      <td><span class="ui-tag ui-tag--neutral">职业资格</span></td>
+                      <td class="ui-table__num">48</td>
+                      <td><span class="ui-chip ui-chip--success"><i class="ui-chip__dot"></i>已上架</span></td>
+                      <td class="ui-table__actions"><button class="ui-link">编辑</button><button class="ui-link">章节</button></td>
+                    </tr>
+                    <tr>
+                      <td class="ui-table__main">
+                        <div class="ui-table__strong">行测 · 判断推理</div>
+                        <div class="ui-table__sub">4 个章节 · 36 道题</div>
+                      </td>
+                      <td><span class="ui-tag ui-tag--neutral">公务员</span></td>
+                      <td class="ui-table__num">36</td>
+                      <td><span class="ui-chip ui-chip--neutral"><i class="ui-chip__dot"></i>已下架</span></td>
+                      <td class="ui-table__actions"><button class="ui-link">编辑</button><button class="ui-link is-danger">删除</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="ui-pager">
+                <span class="ui-pager__info">共 4 个题库</span>
+                <button class="ui-pager__btn" disabled>上一页</button>
+                <button class="ui-pager__btn is-active">1</button>
+                <button class="ui-pager__btn">2</button>
+                <button class="ui-pager__btn">下一页</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.6 空态与提示</h3>
+            <p class="card-desc">空态说明「为什么空 + 下一步」，提示条区分四种语义</p>
+            <div class="gallery">
+              <div class="g-block">
+                <div class="g-label">空态</div>
+                <div class="ui-empty" style="padding: 24px 16px">
+                  <div class="ui-empty__icon">?</div>
+                  <div class="ui-empty__title">还没有错题</div>
+                  <div class="ui-empty__desc">完成章节练习后，答错的题目会自动收进这里。</div>
+                  <div class="ui-empty__actions"><button class="ui-btn ui-btn--primary ui-btn--sm">去练习</button></div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">提示条</div>
+                <div class="ui-alert" style="margin-bottom: 8px">提交后可在结果页查看逐题解析。</div>
+                <div class="ui-alert ui-alert--success" style="margin-bottom: 8px">导入完成，成功 12 条，失败 0 条。</div>
+                <div class="ui-alert ui-alert--warning" style="margin-bottom: 8px">该题库仍有 12 道题未归类，建议补充后再上架。</div>
+                <div class="ui-alert ui-alert--danger">删除后不可恢复，请确认题库内题目已导出。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.7 抽屉与弹窗</h3>
+            <p class="card-desc">表单用抽屉，确认用弹窗；移动端抽屉全屏</p>
+            <div class="grid2">
+              <div>
+                <div class="g-label" style="margin-bottom: 8px">抽屉 · 右侧 460px</div>
+                <div class="drawer-stage">
+                  <div class="ui-mask"></div>
+                  <aside class="ui-drawer is-open" role="dialog" aria-modal="true" aria-label="新建题库">
+                    <header class="ui-drawer__head">
+                      <h2 class="ui-drawer__title">新建题库</h2>
+                      <button class="ui-btn ui-btn--text ui-btn--sm" aria-label="关闭">✕</button>
+                    </header>
+                    <div class="ui-drawer__body">
+                      <div class="ui-field">
+                        <label class="ui-label">题库名称 <em class="ui-label__required">*</em></label>
+                        <input class="ui-input" placeholder="例如：教师资格 · 综合素质" />
+                      </div>
+                      <div class="ui-field">
+                        <label class="ui-label">所属分类</label>
+                        <select class="ui-select"><option>请选择分类</option></select>
+                      </div>
+                    </div>
+                    <footer class="ui-drawer__foot">
+                      <button class="ui-btn ui-btn--default">取消</button>
+                      <button class="ui-btn ui-btn--primary">保存</button>
+                    </footer>
+                  </aside>
+                </div>
+              </div>
+              <div>
+                <div class="g-label" style="margin-bottom: 8px">弹窗 · 480px</div>
+                <div class="modal-stage">
+                  <div class="ui-modal" role="dialog" aria-modal="true" aria-label="删除确认">
+                    <div class="ui-modal__head">
+                      <h3 class="ui-card__title">删除题库</h3>
+                      <button class="ui-btn ui-btn--text ui-btn--sm" aria-label="关闭">✕</button>
+                    </div>
+                    <div class="ui-modal__body">
+                      删除后该题库下的 48 道题将同时下架，且不可恢复。确认继续吗？
+                    </div>
+                    <div class="ui-modal__foot">
+                      <button class="ui-btn ui-btn--default">取消</button>
+                      <button class="ui-btn ui-btn--danger">确认删除</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">4.8 导航与辅助元素</h3>
+            <p class="card-desc">标签页切换内容，分段控件切换视图；进度与骨架屏承接加载</p>
+            <div class="gallery">
+              <div class="g-block">
+                <div class="g-label">标签页 / 分段 / 头像</div>
+                <div class="g-row" style="gap: 24px">
+                  <div class="ui-tabs" style="border: 0">
+                    <button class="ui-tab is-active">答题明细</button>
+                    <button class="ui-tab">统计</button>
+                    <button class="ui-tab">错题</button>
+                  </div>
+                  <div class="ui-segment">
+                    <button class="ui-segment__item is-active">近 7 天</button>
+                    <button class="ui-segment__item">近 30 天</button>
+                  </div>
+                  <div class="g-row" style="gap: 8px">
+                    <span class="ui-avatar ui-avatar--sm">张</span>
+                    <span class="ui-avatar">李</span>
+                    <span class="ui-avatar ui-avatar--lg">王</span>
+                  </div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">进度条</div>
+                <div style="display: grid; gap: 10px; max-width: 420px">
+                  <div class="ui-progress"><div class="ui-progress__bar" style="width: 82%"></div></div>
+                  <div class="ui-progress ui-progress--success"><div class="ui-progress__bar" style="width: 64%"></div></div>
+                  <div class="ui-progress ui-progress--warning"><div class="ui-progress__bar" style="width: 38%"></div></div>
+                  <div class="ui-progress ui-progress--danger"><div class="ui-progress__bar" style="width: 16%"></div></div>
+                </div>
+              </div>
+              <div class="g-block">
+                <div class="g-label">骨架屏</div>
+                <div style="max-width: 420px">
+                  <div class="ui-skeleton ui-skeleton--title"></div>
+                  <div class="ui-skeleton ui-skeleton--text"></div>
+                  <div class="ui-skeleton ui-skeleton--text" style="width: 72%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="responsive">
+          <div class="section-head">
+            <div class="section-num">05</div>
+            <div>
+              <h2>响应式策略</h2>
+              <p class="section-desc">一套代码适配桌面与手机：只收敛列宽、间距与浮层宽度，不复制第二套页面。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">5.1 断点与变化</h3>
+            <p class="card-desc">四个断点，四类变化；移动端基准视口 390 × 844</p>
+            <table class="table">
+              <thead>
+                <tr><th style="width: 140px">断点</th><th style="width: 150px">布局</th><th>变化</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>≥ 1300px</code></td><td>桌面完整态</td><td>侧边栏 232 固定，KPI 四列，表格显示全部列</td></tr>
+                <tr><td><code>900 – 1300px</code></td><td>桌面紧凑态</td><td>KPI 两列，图表图例与轴名进入 compact 模式</td></tr>
+                <tr><td><code>≤ 900px</code></td><td>平板 / 窄窗</td><td>侧边栏收起为抽屉，导航栏出现菜单按钮，内容边距压缩</td></tr>
+                <tr><td><code>≤ 768px</code></td><td>手机</td><td>工具栏铺满、表格隐藏次要列并横向滚动、抽屉全屏、弹窗 92%、图表 240px</td></tr>
+              </tbody>
+            </table>
+
+            <div class="frame-row" style="margin-top: 16px">
+              <div class="frame">
+                <div class="frame-label">桌面 · 1440px</div>
+                <div class="mock">
+                  <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span></div>
+                  <div class="mock-body">
+                    <div class="mock-side">
+                      <div class="mock-line blue" style="width: 60%"></div>
+                      <div class="mock-line" style="width: 90%"></div>
+                      <div class="mock-line" style="width: 74%"></div>
+                      <div class="mock-line" style="width: 82%"></div>
+                      <div class="mock-line" style="width: 68%"></div>
+                    </div>
+                    <div class="mock-content">
+                      <div class="mock-kpis">
+                        <div class="mock-kpi"></div><div class="mock-kpi"></div><div class="mock-kpi"></div><div class="mock-kpi"></div>
+                      </div>
+                      <div class="mock-chart"></div>
+                      <div class="mock-table"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="frame">
+                <div class="frame-label">手机 · 390px</div>
+                <div class="mock mobile">
+                  <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span></div>
+                  <div class="mock-body">
+                    <div class="mock-content">
+                      <div class="mock-kpis">
+                        <div class="mock-kpi"></div><div class="mock-kpi"></div><div class="mock-kpi"></div><div class="mock-kpi"></div>
+                      </div>
+                      <div class="mock-chart"></div>
+                      <div class="mock-table"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-note">
+              桌面保留 4 列 KPI 与完整表格；手机改为 2 列 KPI、图表压缩高度、表格只保留关键列并由容器横向滚动。
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <h3 class="card-title">5.2 移动端处理规则</h3>
+              <p class="card-desc">按优先级从高到低</p>
+              <ul class="check">
+                <li><i></i><span>先隐藏次要列，再考虑压缩字号；字号不随屏宽变小。</span></li>
+                <li><i></i><span>工具栏控件铺满宽度，搜索框占满一整行。</span></li>
+                <li><i></i><span>抽屉全屏、弹窗 92% 宽，表单改单列。</span></li>
+                <li><i></i><span>图表只保留一条主线与必要坐标轴，图例移到顶部。</span></li>
+                <li><i></i><span>分页居中，页码只留上一页 / 当前 / 下一页。</span></li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3 class="card-title">5.3 桌面端不可牺牲项</h3>
+              <p class="card-desc">缩到 900px 前必须保留的能力</p>
+              <ul class="check">
+                <li><i></i><span>批量选择与批量删除入口。</span></li>
+                <li><i></i><span>表格排序、筛选与列宽信息。</span></li>
+                <li><i></i><span>抽屉内表单的完整字段与校验。</span></li>
+                <li><i></i><span>图表的时间范围切换与数值提示。</span></li>
+                <li><i></i><span>键盘操作路径与焦点顺序。</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="a11y">
+          <div class="section-head">
+            <div class="section-num">06</div>
+            <div>
+              <h2>可访问性</h2>
+              <p class="section-desc">对关键文字/背景组合做了对比度实测（WCAG 2.1 相对亮度算法），并列出键盘与语义要求。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">6.1 对比度实测</h3>
+            <p class="card-desc">阈值：正文 4.5:1（AA），大字号 3:1；进度条按 0–18 归一</p>
+
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fff; color: #0f172a">Aa</span><span class="contrast-label">#0F172A / #FFF</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 99%"></div><div class="contrast-threshold" style="left: 25%"><span>4.5</span></div><div class="contrast-threshold" style="left: 16.7%"></div></div>
+              <div class="contrast-score pass">17.85</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fff; color: #475569">Aa</span><span class="contrast-label">#475569 / #FFF</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 42%"></div></div>
+              <div class="contrast-score pass">7.58</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fff; color: #64748b">Aa</span><span class="contrast-label">#64748B / #FFF</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 26%"></div></div>
+              <div class="contrast-score pass">4.76</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fff; color: #94a3b8">Aa</span><span class="contrast-label">#94A3B8 / #FFF</span></div>
+              <div class="contrast-track"><div class="contrast-fill fail" style="width: 14%"></div></div>
+              <div class="contrast-score fail">2.56</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #2563eb; color: #fff">Aa</span><span class="contrast-label">#FFF / #2563EB</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 29%"></div></div>
+              <div class="contrast-score pass">5.17</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #ecfdf5; color: #047857">Aa</span><span class="contrast-label">#047857 / #ECFDF5</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 29%"></div></div>
+              <div class="contrast-score pass">5.21</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fffbeb; color: #b45309">Aa</span><span class="contrast-label">#B45309 / #FFFBEB</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 27%"></div></div>
+              <div class="contrast-score pass">4.84</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #fef2f2; color: #b91c1c">Aa</span><span class="contrast-label">#B91C1C / #FEF2F2</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 33%"></div></div>
+              <div class="contrast-score pass">5.91</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #ecfeff; color: #0e7490">Aa</span><span class="contrast-label">#0E7490 / #ECFEFF</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 29%"></div></div>
+              <div class="contrast-score pass">5.15</div>
+            </div>
+            <div class="contrast-row">
+              <div class="contrast-swatch"><span class="contrast-chip" style="background: #f5f3ff; color: #6d28d9">Aa</span><span class="contrast-label">#6D28D9 / #F5F3FF</span></div>
+              <div class="contrast-track"><div class="contrast-fill" style="width: 36%"></div></div>
+              <div class="contrast-score pass">6.48</div>
+            </div>
+
+            <div class="chart-note">
+              唯一未达标的是 <code>#94A3B8</code>（2.56:1），当前用于 11px 微文案与占位说明。建议：正文语义的说明文字改用 <code>#64748B</code>；确需更浅时只用于装饰性文字，不承载关键信息。
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">6.2 语义与键盘</h3>
+            <p class="card-desc">组件层已内置的实现项与仍需业务层补齐的项目</p>
+            <table class="table">
+              <thead>
+                <tr><th style="width: 170px">检查项</th><th style="width: 110px">状态</th><th>说明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>可见焦点环</td><td><span class="tag-mini ok">已内置</span></td><td>按钮、输入、开关均使用 <code>:focus-visible</code>，2px 主色描边</td></tr>
+                <tr><td>开关语义</td><td><span class="tag-mini ok">已内置</span></td><td><code>role="switch"</code> + <code>aria-checked</code></td></tr>
+                <tr><td>抽屉语义</td><td><span class="tag-mini ok">已内置</span></td><td><code>role="dialog"</code> + <code>aria-modal</code>，ESC 关闭需业务接入</td></tr>
+                <tr><td>图标按钮</td><td><span class="tag-mini warn">需约定</span></td><td>必须补 <code>aria-label</code>，禁止只有图标无文字</td></tr>
+                <tr><td>表格表头</td><td><span class="tag-mini warn">需约定</span></td><td>使用 <code>&lt;th scope="col"&gt;</code>，空态用 <code>colspan</code></td></tr>
+                <tr><td>键盘可达</td><td><span class="tag-mini warn">需验证</span></td><td>抽屉焦点移入 / 关闭后归还，Tab 顺序与视觉一致</td></tr>
+                <tr><td>字号放大</td><td><span class="tag-mini ok">已支持</span></td><td>不禁用缩放，允许系统字号放大</td></tr>
+                <tr><td>减少动效</td><td><span class="tag-mini ok">已内置</span></td><td><code>prefers-reduced-motion</code> 降级</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="adoption">
+          <div class="section-head">
+            <div class="section-num">07</div>
+            <div>
+              <h2>落地清单</h2>
+              <p class="section-desc">复制两个文件、按顺序引入，即可在新项目获得同一套视觉；组件按需取用，不强制全量。</p>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <h3 class="card-title">7.1 文件与引入顺序</h3>
+              <p class="card-desc">令牌必须先于组件，组件先于业务样式</p>
+              <table class="table">
+                <thead><tr><th>文件</th><th>作用</th></tr></thead>
+                <tbody>
+                  <tr><td><code>tokens.css</code></td><td>128 项变量 + 基础元素 + Element Plus 映射</td></tr>
+                  <tr><td><code>components.css</code></td><td>25 个组件，约 34 KB 未压缩</td></tr>
+                  <tr><td><code>app.css</code></td><td>业务布局与页面级样式</td></tr>
+                </tbody>
+              </table>
+              <div class="chart-note">Vue / React 在入口文件按 token → components → app 的顺序 import；Element Plus 项目根容器加 <code>ui-scope</code>。</div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">7.2 上线前检查</h3>
+              <p class="card-desc">每条都可直接判定</p>
+              <ul class="check">
+                <li><i></i><span>业务样式无硬编码 hex，全部引用 <code>--ui-*</code>。</span></li>
+                <li><i></i><span>一屏只有一个主按钮，危险操作有二次确认。</span></li>
+                <li><i></i><span>列表页具备加载、空态、错误三态。</span></li>
+                <li><i></i><span>390px 下无横向滚动、无遮挡、无文字竖排。</span></li>
+                <li><i></i><span>所有可交互元素键盘可达，焦点可见。</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">7.3 版本与维护</h3>
+            <table class="table">
+              <thead><tr><th style="width: 130px">项目</th><th>约定</th></tr></thead>
+              <tbody>
+                <tr><td>版本</td><td>v1.0 · 2026-10-18；破坏性变更升次版本号，令牌只增不删</td></tr>
+                <tr><td>新增组件</td><td>先补令牌 → 实现 <code>components.css</code> → 加可视化示例 → 更新组件规范</td></tr>
+                <tr><td>主题扩展</td><td>暗色主题只替换语义层变量，不改组件实现</td></tr>
+                <tr><td>图表色</td><td>固定 8 色顺序取色，不随业务随意新增颜色</td></tr>
+                <tr><td>维护责任</td><td>设计系统改动需同时更新规范页与本报告，避免文档与代码脱节</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
+        <div class="foot">
+          <span>练题云 UI 设计系统 · 可视化报告 v1.0</span>
+          <span>配套：tokens.css · components.css · index.html · 组件规范.md</span>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const links = Array.from(document.querySelectorAll('.nav a'));
+      const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((e) => e.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (!visible) return;
+            links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + visible.target.id));
+          },
+          { rootMargin: '-8% 0px -72% 0px', threshold: [0, 0.2, 0.6] }
+        );
+        sections.forEach((s) => observer.observe(s));
+      }
+    </script>
+  </body>
+</html>

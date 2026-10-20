@@ -1,0 +1,38 @@
+# ---------- 依赖 ----------
+node_modules/
+
+# ---------- 构建产物 ----------
+admin/dist/
+server/public/
+# server/mobile 由 `npm run sync:mobile` 从仓库根 mobile/ 生成
+server/mobile/
+
+# ---------- 环境变量与密钥（勿提交） ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# ---------- 数据库与本地备份（含真实账号/卡密数据，不入库） ----------
+server/data/*.db
+server/data/*.db-wal
+server/data/*.db-shm
+*.db.bak
+*.bak
+.backups/
+.bak/
+
+# ---------- 本地工具数据 ----------
+.workbuddy/
+*.genie
+
+# ---------- 临时脚本 ----------
+server/tmp-api.mjs
+tmp-*.mjs
+
+# ---------- 系统与日志 ----------
+.DS_Store
+Thumbs.db
+*.log
